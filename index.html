@@ -3,28 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BTD6 CHIMPS Planner</title>
+    <title>BTD6 Ultimate CHIMPS Planner</title>
     <style>
         :root { --primary: #00d1b2; --bg-card: #1a1c23; --bg-body: #0b0e14; --border: #2d333b; }
         .coop-mode { --primary: #ffdd57; --border: #5d4d8a; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg-body); color: #e0e0e0; padding: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg-body); color: #e0e0e0; padding: 20px; transition: all 0.3s ease; }
         .container { max-width: 850px; margin: auto; background: var(--bg-card); padding: 25px; border-radius: 12px; border: 2px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
         h2 { color: var(--primary); text-align: center; text-transform: uppercase; margin-bottom: 5px; }
         .subtitle { text-align: center; color: #7a7a7a; font-size: 0.85em; margin-bottom: 20px; }
         .coop-toggle-container { display: flex; justify-content: center; align-items: center; margin-bottom: 20px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; }
         .coop-toggle-container label { color: #fff; margin-left: 10px; cursor: pointer; font-size: 0.9em; font-weight: bold; }
-        .input-group { margin-bottom: 15px; }
+        .section-title { color: var(--primary); font-size: 0.8em; letter-spacing: 1px; margin: 20px 0 10px 0; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
         label { display: block; margin-bottom: 5px; color: var(--primary); font-weight: bold; font-size: 0.9em; }
-        select, input[type="number"] { width: 100%; padding: 10px; border-radius: 6px; background: #2d333b; color: white; border: 1px solid #3e444d; outline: none; box-sizing: border-box; }
-        .flex-row { display: flex; gap: 10px; margin-bottom: 15px; }
+        select, input[type="number"] { width: 100%; padding: 10px; border-radius: 6px; background: #2d333b; color: white; border: 1px solid #3e444d; outline: none; box-sizing: border-box; margin-bottom: 10px; }
+        .flex-row { display: flex; gap: 15px; margin-bottom: 10px; }
         .flex-row div { flex: 1; }
-        .projection-result { font-size: 1.2em; color: var(--primary); text-align: center; font-weight: bold; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 8px; }
-        .btn-random { width: 100%; padding: 12px; background: var(--primary); color: #0b0e14; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 20px; }
-        .summary { background: #0b0e14; padding: 20px; border-radius: 10px; border-left: 5px solid var(--primary); margin-top: 20px; }
+        .projector-box { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .projection-result { font-size: 1.3em; color: var(--primary); text-align: center; font-weight: bold; }
+        .btn-random { width: 100%; padding: 15px; background: var(--primary); color: #0b0e14; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 20px; font-size: 1em; }
+        .summary { background: #0b0e14; padding: 20px; border-radius: 10px; border-left: 5px solid var(--primary); }
         .total-box { font-size: 1.8em; text-align: center; margin-top: 10px; padding: 15px; border-radius: 8px; font-weight: bold; }
         .under-budget { border: 2px solid #00d1b2; color: #00d1b2; background: rgba(0, 209, 178, 0.05); }
         .over-budget { border: 2px solid #ff3860; color: #ff3860; background: rgba(255, 56, 96, 0.05); }
-        .cost-row { display: flex; justify-content: space-between; border-bottom: 1px solid #2d333b; padding: 8px 0; }
+        .cost-row { display: flex; justify-content: space-between; border-bottom: 1px solid #2d333b; padding: 8px 0; font-size: 0.95em; }
     </style>
 </head>
 <body id="mainBody">
@@ -35,42 +36,29 @@
 
     <div class="coop-toggle-container">
         <input type="checkbox" id="coopToggle" onchange="toggleCoop()">
-        <label for="coopToggle">👥 3-Player Co-op (Me & Brother: 2/3 Cash)</label>
+        <label for="coopToggle">👥 3-Player Co-op (Me & Brother: 2/3 Total Share)</label>
     </div>
 
-    <div class="flex-row">
-        <div>
-            <label>Current Cash</label>
-            <input type="number" id="curCash" value="0" oninput="updateUI()">
+    <div class="section-title">FUTURE CASH PROJECTOR</div>
+    <div class="projector-box">
+        <div class="flex-row">
+            <div><label>Current Cash</label><input type="number" id="curCash" value="0" oninput="updateUI()"></div>
+            <div><label>Current Round</label><input type="number" id="curRound" value="6" min="6" max="100" oninput="updateUI()"></div>
+            <div><label>Target Round</label><input type="number" id="futRound" value="100" min="6" max="100" oninput="updateUI()"></div>
         </div>
-        <div>
-            <label>Current Round</label>
-            <input type="number" id="curRound" value="6" min="6" max="100" oninput="updateUI()">
-        </div>
-        <div>
-            <label>Target Round</label>
-            <input type="number" id="futRound" value="100" min="6" max="100" oninput="updateUI()">
-        </div>
+        <div id="projectionDisplay" class="projection-result">Projected: $0</div>
     </div>
-    <div id="projectionDisplay" class="projection-result">Projected Wallet: $0</div>
 
-    <br>
-    <button class="btn-random" onclick="rollRandom()">🎲 RANDOM FULL BUILD</button>
+    <button class="btn-random" onclick="rollRandom()">🎲 RANDOM T5 BUILD</button>
 
     <div class="input-group">
-        <label>Hero:</label>
+        <label>Hero Selection:</label>
         <select id="heroSelect" onchange="updateUI()"></select>
     </div>
 
     <div class="flex-row">
-        <div class="input-group">
-            <label>T5 Choice 1:</label>
-            <select id="tower1" onchange="updateUI()"></select>
-        </div>
-        <div class="input-group">
-            <label>T5 Choice 2:</label>
-            <select id="tower2" onchange="updateUI()"></select>
-        </div>
+        <div><label>T5 Choice 1:</label><select id="tower1" onchange="updateUI()"></select></div>
+        <div><label>T5 Choice 2:</label><select id="tower2" onchange="updateUI()"></select></div>
     </div>
 
     <div class="summary">
@@ -81,60 +69,105 @@
 </div>
 
 <script>
-// VERIFIED 2025 CUMULATIVE CHIMPS CASH DATA (Ends of rounds)
-const CUMULATIVE_CASH = {
-    6: 813, 7: 995, 8: 1195, 9: 1394, 10: 1708, 11: 1897, 12: 2089, 13: 2371, 14: 2630, 15: 2896,
-    20: 4133, 25: 5561, 30: 7548, 35: 10979, 40: 16771, 45: 22442, 50: 34614, 55: 41920, 60: 51200,
-    63: 59616, 70: 78400, 80: 98717, 85: 122000, 90: 145812, 95: 172715, 98: 193929, 100: 179909
+// EXACT CUMULATIVE EARNED CASH DATA (CHIMPS)
+const ROUND_CASH = {
+    6: 650, 7: 902, 8: 1222, 9: 1582, 10: 1914, 15: 3612, 20: 5546, 25: 7514, 30: 9706, 35: 12690, 
+    40: 16400, 45: 21102, 50: 27076, 55: 34220, 60: 42426, 65: 52140, 70: 62410, 75: 76542, 
+    80: 91104, 85: 110904, 90: 131754, 95: 157585, 100: 178909
 };
 
-// Fill in gaps with interpolation for missing rounds in the quick-data set
+// Interpolate the missing rounds for the data object
 for(let i=6; i<=100; i++) {
-    if(!CUMULATIVE_CASH[i]) {
-        let prev = i-1; while(!CUMULATIVE_CASH[prev]) prev--;
-        let next = i+1; while(!CUMULATIVE_CASH[next] && next < 100) next++;
-        let step = (CUMULATIVE_CASH[next] - CUMULATIVE_CASH[prev]) / (next - prev);
-        CUMULATIVE_CASH[i] = Math.floor(CUMULATIVE_CASH[prev] + step);
+    if(!ROUND_CASH[i]) {
+        let prev = i-1; while(!ROUND_CASH[prev]) prev--;
+        let next = i+1; while(!ROUND_CASH[next]) next++;
+        let step = (ROUND_CASH[next] - ROUND_CASH[prev]) / (next - prev);
+        ROUND_CASH[i] = Math.floor(ROUND_CASH[prev] + step);
     }
 }
 
 const DATA = {
-    heroes: [{ name: "Quincy", price: 585 }, { name: "Sauda", price: 650 }, { name: "Churchill", price: 2160 }, { name: "Geraldo", price: 1325 }],
-    P: [{ name: "Dart: XBM", price: 27375 }, { name: "Tack: Zone", price: 25850 }],
-    M: [{ name: "Sub: Commander", price: 34000 }, { name: "Ace: Sky Shredder", price: 46100 }],
-    G: [{ name: "Wizard: POD", price: 31800 }, { name: "Ninja: Grandmaster", price: 52000 }],
-    S: [{ name: "Spike: Perma", price: 39500 }, { name: "Beast: Pouākai", price: 48000 }]
+    heroes: [{name:"Quincy", price:585},{name:"Gwen", price:970},{name:"Obyn", price:700},{name:"Churchill", price:2160},{name:"Ezili", price:650},{name:"Pat Fusty", price:865},{name:"Adora", price:1080},{name:"Brickell", price:970},{name:"Etienne", price:920},{name:"Sauda", price:650},{name:"Psi", price:1080},{name:"Geraldo", price:1325},{name:"Corvus", price:1325},{name:"Silas", price:1200},{name:"Rosalia", price:1100}],
+    P: [{name:"Dart: Ultra-Jugg", price:18740},{name:"Dart: PMFC", price:53700},{name:"Dart: XBM", price:27375},{name:"Boomer: Glaive Lord", price:42100},{name:"Tack: Inferno Ring", price:55500},{name:"Tack: Tack Zone", price:25850},{name:"Glue: Solver", price:31000}],
+    M: [{name:"Sniper: Cripple", price:45000},{name:"Sniper: Elite Def", price:17500},{name:"Sub: Commander", price:34000},{name:"Ace: Sky Shredder", price:46100},{name:"Ace: Big Plane", price:102000},{name:"Heli: Apache", price:58000}],
+    G: [{name:"Wizard: Archmage", price:42500},{name:"Wizard: POD", price:31800},{name:"Ninja: Grandmaster", price:52000},{name:"Ninja: Master Bomber", price:44000},{name:"Druid: Avatar", price:52000},{name:"Mermonkey: Popseidon", price:48000}],
+    S: [{name:"Spike: Perma", price:39500},{name:"Spike: Mines", price:162500},{name:"Engi: Sentry Champ", price:36000},{name:"Beast: Pouākai", price:48000}]
 };
 
 function toggleCoop() {
-    document.getElementById('mainBody').classList.toggle('coop-mode');
+    const isCoop = document.getElementById('coopToggle').checked;
+    document.getElementById('mainBody').classList.toggle('coop-mode', isCoop);
+    document.getElementById('modeSubtitle').innerText = isCoop ? "Co-op Mode (2/3 Team Share)" : "Single Player Mode";
     updateUI();
 }
 
 function updateUI() {
     const isCoop = document.getElementById('coopToggle').checked;
-    const curC = parseInt(document.getElementById('curCash').value) || 0;
-    const curR = parseInt(document.getElementById('curRound').value);
-    const futR = parseInt(document.getElementById('futRound').value);
+    const curCash = parseFloat(document.getElementById('curCash').value) || 0;
+    const curR = parseInt(document.getElementById('curRound').value) || 6;
+    const futR = parseInt(document.getElementById('futRound').value) || 100;
 
-    const earned = CUMULATIVE_CASH[futR] - CUMULATIVE_CASH[curR];
-    const projected = curC + (isCoop ? earned * 0.66 : earned);
-    document.getElementById('projectionDisplay').innerText = `Projected Wallet: $${Math.floor(projected).toLocaleString()}`;
+    // Calculate income earned between current and future round
+    const totalNewIncome = ROUND_CASH[futR] - ROUND_CASH[curR];
+    const myIncomeShare = isCoop ? (totalNewIncome * 0.666) : totalNewIncome;
+    const finalProjected = curCash + myIncomeShare;
     
-    // Total calculation logic remains similar but uses corrected budget ceiling
-    const totalPossible = isCoop ? (CUMULATIVE_CASH[futR] * 0.66) + 300 : CUMULATIVE_CASH[futR];
-    document.getElementById('totalDisplay').className = "total-box " + (projected < 0 ? "over-budget" : "under-budget");
+    document.getElementById('projectionDisplay').innerText = `Projected Wallet: $${Math.floor(finalProjected).toLocaleString()}`;
+
+    // Build Math
+    const hObj = DATA.heroes[document.getElementById('heroSelect').value];
+    const t1 = getTower(document.getElementById('tower1').value);
+    const t2 = getTower(document.getElementById('tower2').value);
+    const totalCost = hObj.price + t1.price + t2.price;
+
+    document.getElementById('priceReport').innerHTML = `
+        <div class="cost-row"><span>${hObj.name}</span><span>$${hObj.price.toLocaleString()}</span></div>
+        <div class="cost-row"><span>${t1.name}</span><span>$${t1.price.toLocaleString()}</span></div>
+        <div class="cost-row"><span>${t2.name}</span><span>$${t2.price.toLocaleString()}</span></div>
+    `;
+
+    const totalBox = document.getElementById('totalDisplay');
+    totalBox.innerText = `Total Cost: $${totalCost.toLocaleString()}`;
+    totalBox.className = "total-box " + (totalCost > finalProjected ? "over-budget" : "under-budget");
+    
+    document.getElementById('saveupAdvice').innerHTML = totalCost > finalProjected 
+        ? `🚨 Short by $${Math.floor(totalCost - finalProjected).toLocaleString()}` 
+        : `✅ Affordable with $${Math.floor(finalProjected - totalCost).toLocaleString()} extra!`;
+}
+
+function getTower(val) {
+    if(!val) return {name:"None", price:0};
+    return DATA[val[0]][val.substring(1)] || {name:"None", price:0};
+}
+
+function populate() {
+    const hSel = document.getElementById('heroSelect');
+    DATA.heroes.forEach((h, i) => hSel.add(new Option(`${h.name} ($${h.price})`, i)));
+    
+    ['tower1', 'tower2'].forEach(id => {
+        const s = document.getElementById(id);
+        const cats = [{l:"Primary", k:"P"}, {l:"Military", k:"M"}, {l:"Magic", k:"G"}, {l:"Support", k:"S"}];
+        cats.forEach(c => {
+            const g = document.createElement('optgroup'); g.label = c.l;
+            DATA[c.k].forEach((t, i) => g.appendChild(new Option(t.name, c.k + i)));
+            s.appendChild(g);
+        });
+    });
 }
 
 function rollRandom() {
+    document.getElementById('heroSelect').selectedIndex = Math.floor(Math.random() * DATA.heroes.length);
     const cats = ['P', 'M', 'G', 'S'];
-    const rCat1 = cats[Math.floor(Math.random() * cats.length)];
-    const rCat2 = cats[Math.floor(Math.random() * cats.length)];
-    // Logic to set select values...
+    [1, 2].forEach(num => {
+        const c = cats[Math.floor(Math.random() * 4)];
+        const i = Math.floor(Math.random() * DATA[c].length);
+        document.getElementById('tower' + num).value = c + i;
+    });
     updateUI();
 }
 
-// Initialization code for populating selects...
+populate();
+updateUI();
 </script>
 </body>
 </html>
