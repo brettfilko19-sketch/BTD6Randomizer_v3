@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BTD6 Ultimate Planner - Desperado Update</title>
+    <title>BTD6 Planner - Desperado Update</title>
     <style>
         :root { --primary: #00d1b2; --bg-card: #1a1c23; --bg-body: #0b0e14; --border: #2d333b; }
         .coop-mode { --primary: #ffdd57; --border: #5d4d8a; }
@@ -36,10 +36,10 @@
 
     <div class="coop-toggle-container">
         <input type="checkbox" id="coopToggle" onchange="toggleCoop()">
-        <label for="coopToggle">👥 3-Player Co-op (2/3 Share)</label>
+        <label for="coopToggle">👥 3-Player Co-op (Me & Brother: 2/3 Share)</label>
     </div>
 
-    <div class="section-title">CASH PROJECTOR (2025 VERIFIED)</div>
+    <div class="section-title">CASH PROJECTOR (2025 UPDATED)</div>
     <div class="projector-box">
         <div class="flex-row">
             <div><label>Current Cash</label><input type="number" id="curCash" value="650" oninput="updateUI()"></div>
@@ -77,36 +77,31 @@ const DATA = {
         {name:"Psi", price:1080}, {name:"Geraldo", price:1325}, {name:"Corvus", price:1325}, {name:"Rosalia", price:1100}, {name:"Silas", price:1200}
     ],
     P: [
+        {name:"Desperado: Blazing Sun (Top)", price:38400},
+        {name:"Desperado: Golden Justice (Mid)", price:54000},
+        {name:"Desperado: Desert Phantom (Bot)", price:42600},
         {name:"Dart: Ultra-Jugg", price:18740}, {name:"Dart: PMFC", price:53700}, {name:"Dart: XBM", price:27375},
-        {name:"Boomer: Glaive Lord", price:42100}, {name:"Boomer: Perma Charge", price:41250}, {name:"Boomer: MOAB Dom", price:63500},
-        {name:"Bomb: Bloon Crush", price:61000}, {name:"Bomb: MOAB Elim", price:31500}, {name:"Bomb: Bomb Blitz", price:40500},
-        {name:"Tack: Inferno Ring", price:55500}, {name:"Tack: S-Maelstrom", price:18500}, {name:"Tack: Zone", price:25850},
-        {name:"Ice: Super Brittle", price:38500}, {name:"Ice: Absolute Zero", price:26000}, {name:"Ice: Icicle Impale", price:38200},
-        {name:"Glue: Solver", price:31000}, {name:"Glue: Glue Storm", price:19500}, {name:"Glue: Super Glue", price:35000}
+        {name:"Boomer: Glaive Lord", price:42100}, {name:"Boomer: MOAB Dom", price:63500},
+        {name:"Bomb: Bloon Crush", price:61000}, {name:"Bomb: Bomb Blitz", price:40500},
+        {name:"Tack: Inferno Ring", price:55500}, {name:"Tack: Zone", price:25850},
+        {name:"Ice: Icicle Impale", price:38200}, {name:"Glue: Solver", price:31000}
     ],
     M: [
-        {name:"Sniper: Cripple MOAB", price:45000}, {name:"Sniper: Elite Sniper", price:21500}, {name:"Sniper: Elite Def", price:17500},
-        {name:"Sub: Energizer", price:37000}, {name:"Sub: Pre-Emptive", price:43000}, {name:"Sub: Sub Commander", price:34000},
-        {name:"Boat: Flagship", price:38000}, {name:"Boat: Pirate Lord", price:28000}, {name:"Boat: Trade Empire", price:26000},
-        {name:"Ace: Sky Shredder", price:46100}, {name:"Ace: Tsar Bomba", price:38000}, {name:"Ace: Flying Fortress", price:102000},
-        {name:"Heli: Apache Prime", price:58000}, {name:"Heli: Special Poperat.", price:32000}, {name:"Heli: Com. Commander", price:38000},
-        {name:"Mortar: The Biggest One", price:38000}, {name:"Mortar: Pop and Awe", price:35000}, {name:"Mortar: Blooncineration", price:48000},
-        {name:"Dartling: Ray of Doom", price:112000}, {name:"Dartling: MAD", price:72000}, {name:"Dartling: BEZ", price:62000},
-        {name:"Dartling: DESPERADO", price:54000}
+        {name:"Sniper: Elite Def", price:17500}, {name:"Sub: Pre-Emptive", price:43000},
+        {name:"Sub: Sub Commander", price:34000}, {name:"Boat: Flagship", price:38000},
+        {name:"Ace: Sky Shredder", price:46100}, {name:"Ace: Flying Fortress", price:102000},
+        {name:"Heli: Apache Prime", price:58000}, {name:"Heli: Com. Commander", price:38000},
+        {name:"Dartling: Ray of Doom", price:112000}, {name:"Dartling: BEZ", price:62000}
     ],
     G: [
-        {name:"Wizard: Archmage", price:42500}, {name:"Wizard: WLP", price:65000}, {name:"Wizard: Prince Darkness", price:31800},
-        {name:"Super: True Sun God", price:650000}, {name:"Super: Anti-Bloon", price:103000}, {name:"Super: Legend of Night", price:255000},
-        {name:"Ninja: Grandmaster", price:52000}, {name:"Ninja: Grand Sabo", price:25000}, {name:"Ninja: Master Bomber", price:44000},
-        {name:"Alch: Permabrew", price:72000}, {name:"Alch: Total Transfo", price:51000}, {name:"Alch: BMA", price:54000},
-        {name:"Druid: Superstorm", price:75000}, {name:"Druid: Spirit Forest", price:48000}, {name:"Druid: Avatar Wrath", price:52000},
-        {name:"Mermonkey: Abyss Lord", price:34500}, {name:"Mermonkey: Popseidon", price:48000}, {name:"Mermonkey: Final Harmonic", price:41200}
+        {name:"Wizard: Prince Darkness", price:31800}, {name:"Super: Anti-Bloon", price:103000},
+        {name:"Ninja: Grandmaster", price:52000}, {name:"Ninja: Master Bomber", price:44000},
+        {name:"Druid: Spirit Forest", price:48000}, {name:"Druid: Avatar Wrath", price:52000},
+        {name:"Mermonkey: Popseidon", price:48000}
     ],
     S: [
-        {name:"Spike: Super Mines", price:162500}, {name:"Spike: Carpet Spikes", price:45000}, {name:"Spike: Perma-Spike", price:39500},
-        {name:"Village: Prim. Expert", price:32000}, {name:"Village: Homeland", price:55000}, {name:"Village: Monkeyopolis", price:15000},
-        {name:"Engi: Sentry Champion", price:36000}, {name:"Engi: Ultraboost", price:115000}, {name:"Engi: XXXL Trap", price:62000},
-        {name:"Beast: Megalodon", price:65000}, {name:"Beast: Pouākai", price:48000}, {name:"Beast: Giganotosaurus", price:82000}
+        {name:"Spike: Perma-Spike", price:39500}, {name:"Village: Prim. Expert", price:32000},
+        {name:"Engi: Sentry Champion", price:36000}, {name:"Beast: Pouākai", price:48000}
     ]
 };
 
@@ -127,7 +122,6 @@ function getCashAtRound(r) {
 function toggleCoop() {
     const isCoop = document.getElementById('coopToggle').checked;
     document.getElementById('curCash').value = isCoop ? 900 : 650;
-    document.getElementById('curRound').value = 6;
     updateUI();
 }
 
@@ -137,8 +131,8 @@ function updateUI() {
     const curR = parseInt(document.getElementById('curRound').value) || 6;
     const futR = parseInt(document.getElementById('futRound').value) || 100;
 
-    const teamEarnedSinceCurrentRound = getCashAtRound(futR) - getCashAtRound(curR);
-    const myShare = isCoop ? (teamEarnedSinceCurrentRound * 0.666) : teamEarnedSinceCurrentRound;
+    const teamEarned = getCashAtRound(futR) - getCashAtRound(curR);
+    const myShare = isCoop ? (teamEarned * 0.666) : teamEarned;
     const totalProjected = curCash + myShare;
 
     document.getElementById('projectionDisplay').innerText = `Projected Wallet: $${Math.floor(totalProjected).toLocaleString()}`;
@@ -186,11 +180,10 @@ function populate() {
 
 function rollRandom() {
     document.getElementById('heroSelect').selectedIndex = Math.floor(Math.random() * DATA.heroes.length);
-    const cats = ['P', 'M', 'G', 'S'];
-    [1, 2].forEach(num => {
+    ['tower1', 'tower2'].forEach(id => {
+        const cats = ['P', 'M', 'G', 'S'];
         const cat = cats[Math.floor(Math.random() * 4)];
-        const idx = Math.floor(Math.random() * DATA[cat].length);
-        document.getElementById('tower' + num).value = cat + idx;
+        document.getElementById(id).value = cat + Math.floor(Math.random() * DATA[cat].length);
     });
     updateUI();
 }
