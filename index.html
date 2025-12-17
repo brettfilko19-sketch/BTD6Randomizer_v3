@@ -32,10 +32,10 @@
 
         .input-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; color: var(--primary); font-weight: bold; font-size: 0.9em; }
-        select, input[type="number"] { width: 100%; padding: 10px; border-radius: 6px; background: #2d333b; color: white; border: 1px solid #3e444d; box-sizing: border-box; outline: none; }
+        select, input[type="number"] { width: 100%; padding: 10px; border-radius: 6px; background: #2d333b; color: white; border: 1px solid #3e444d; cursor: pointer; outline: none; box-sizing: border-box; }
         
         .goal-section { background: rgba(0, 0, 0, 0.3); border: 1px dashed var(--primary); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-        
+
         .btn-random { width: 100%; padding: 15px; background: var(--primary); color: #0b0e14; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 20px; transition: 0.2s; }
         .btn-random:hover { opacity: 0.9; transform: scale(1.01); }
         
@@ -182,26 +182,38 @@ function updateUI() {
     const t1Val = document.getElementById('tower1').value;
     const t2Val = document.getElementById('tower2').value;
     const isCoop = document.getElementById('coopToggle').checked;
-    const target = parseInt(document.getElementById('targetRound').value) || 100;
+    const target = parseInt(document.getElementById('targetRound').value) || 6;
 
     const hero = DATA.heroes[hIdx] || { name: "None", price: 0 };
     const t1 = getTowerData(t1Val);
     const t2 = getTowerData(t2Val);
 
-    const total = Number(hero.price) + Number(t1.price) + Number(t2.price);
+    const totalCost = Number(hero.price) + Number(t1.price) + Number(t2.price);
     
-    // Estimate total map cash for round
-    let totalMapCash = 0;
-    if (target <= 40) totalMapCash = (target/40) * 14200;
-    else if (target <= 60) totalMapCash = 14200 + ((target-40)/20) * 24300;
-    else if (target <= 80) totalMapCash = 38500 + ((target-60)/20) * 46000;
-    else if (target <= 100) totalMapCash = 84500 + ((target-80)/20) * 94400;
+    let myCashShare = 0;
 
-    // Adjust share based on co-op
-    const myCashShare = isCoop ? (totalMapCash * 0.666) : totalMapCash;
+    if (!isCoop) {
+        const soloStart = 650;
+        if (target <= 6) myCashShare = soloStart;
+        else if (target <= 40) myCashShare = soloStart + ((target - 6) / 34) * (14200 - soloStart);
+        else if (target <= 60) myCashShare = 14200 + ((target - 40) / 20) * 24300;
+        else if (target <= 80) myCashShare = 38500 + ((target - 60) / 20) * 46000;
+        else myCashShare = 84500 + ((target - 80) / 20) * 94400;
+    } else {
+        const coopStartPerPerson = 450;
+        const myTeamStart = coopStartPerPerson * 2; 
+        let totalMapEarned = 0;
+        if (target > 6) {
+            if (target <= 40) totalMapEarned = ((target - 6) / 34) * (14200 - 650);
+            else if (target <= 60) totalMapEarned = (14200 - 650) + ((target - 40) / 20) * 24300;
+            else if (target <= 80) totalMapEarned = (38500 - 650) + ((target - 60) / 20) * 46000;
+            else totalMapEarned = (84500 - 650) + ((target - 80) / 20) * 94400;
+        }
+        myCashShare = myTeamStart + (totalMapEarned * 0.666);
+    }
+
     const displayRoundCash = Math.floor(myCashShare);
-
-    document.getElementById('roundInfo').innerText = `Your Share by R${target}: ~$${displayRoundCash.toLocaleString()}`;
+    document.getElementById('roundInfo').innerText = `Combined Share by R${target}: ~$${displayRoundCash.toLocaleString()}`;
 
     document.getElementById('priceReport').innerHTML = `
         <div class="cost-row"><span>${hero.name}</span><span>$${hero.price.toLocaleString()}</span></div>
@@ -212,27 +224,22 @@ function updateUI() {
     const totalBox = document.getElementById('totalDisplay');
     const advice = document.getElementById('saveupAdvice');
     
-    totalBox.innerText = `Total: $${total.toLocaleString()}`;
+    totalBox.innerText = `Total: $${totalCost.toLocaleString()}`;
     totalBox.className = "total-box";
 
-    if (total > myCashShare) {
+    if (totalCost > myCashShare) {
         totalBox.classList.add('over-budget');
-        const diff = Math.floor(total - myCashShare);
-        advice.innerHTML = `<span style='color:#ff3860'>🚨 SAVE-UP FAIL:</span> Short by $${diff.toLocaleString()} at Round ${target}.`;
+        advice.innerHTML = `<span style='color:#ff3860'>🚨 SAVE-UP FAIL:</span> Short by $${Math.floor(totalCost - myCashShare).toLocaleString()}.`;
     } else {
         totalBox.classList.add(isCoop ? 'coop-warning' : 'under-budget');
-        const surplus = Math.floor(myCashShare - total);
-        advice.innerHTML = `<span style='color:${isCoop ? "#ffdd57" : "#00d1b2"}'>✅ ON TRACK:</span> $${surplus.toLocaleString()} surplus for other towers!`;
+        advice.innerHTML = `<span style='color:${isCoop ? "#ffdd57" : "#00d1b2"}'>✅ ON TRACK:</span> $${Math.floor(myCashShare - totalCost).toLocaleString()} surplus!`;
     }
 }
 
 function rollRandom() {
-    const hSelect = document.getElementById('heroSelect');
-    const t1Select = document.getElementById('tower1');
-    const t2Select = document.getElementById('tower2');
-    hSelect.selectedIndex = Math.floor(Math.random() * hSelect.options.length);
-    t1Select.selectedIndex = Math.floor(Math.random() * t1Select.options.length);
-    t2Select.selectedIndex = Math.floor(Math.random() * t2Select.options.length);
+    document.getElementById('heroSelect').selectedIndex = Math.floor(Math.random() * DATA.heroes.length);
+    document.getElementById('tower1').selectedIndex = Math.floor(Math.random() * document.getElementById('tower1').options.length);
+    document.getElementById('tower2').selectedIndex = Math.floor(Math.random() * document.getElementById('tower2').options.length);
     updateUI();
 }
 
