@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BTD6 Learning Meta Planner</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: #e0e0e0; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: #16213e; padding: 25px; border-radius: 12px; border: 1px solid #0f3460; }
+        h2 { color: #4ecca3; text-align: center; text-transform: uppercase; }
+        select { width: 100%; padding: 12px; margin-top: 10px; background: #0f3460; color: white; border-radius: 6px; border: 1px solid #1a1a2e; }
+        .btn-random { width: 100%; padding: 15px; margin-bottom: 20px; background: #4ecca3; font-weight: bold; border-radius: 8px; cursor: pointer; }
+        
+        /* Feedback Buttons */
+        .feedback-row { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-feed { flex: 1; padding: 10px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; color: white; }
+        .upvote { background: #2ecc71; }
+        .downvote { background: #e74c3c; }
+
+        .summary { margin-top: 20px; padding: 20px; background: #0f3460; border-radius: 8px; border-left: 5px solid #4ecca3; position: relative; }
+        .grade-badge { position: absolute; top: 10px; right: 20px; font-size: 3em; font-weight: 900; }
+        .analysis-text { color: #95a5a6; font-style: italic; margin-top: 10px; }
+        .total-box { font-size: 1.5em; text-align: center; margin-top: 15px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Learning Meta Planner</h2>
+    <button class="btn-random" onclick="rollRandom()">🎲 ROLL RANDOM STRATEGY</button>
+
+    <label>Hero:</label>
+    <select id="heroSelect" onchange="updateUI()"></select>
+    <label>Tower 1:</label>
+    <select id="tower1" onchange="updateUI()"></select>
+    <label>Tower 2:</label>
+    <select id="tower2" onchange="updateUI()"></select>
+
+    <div class="summary">
+        <div id="gradeDisplay" class="grade-badge">?</div>
+        <div id="priceReport"></div>
+        <div id="analysis" class="analysis-text"></div>
+        
+        <div class="feedback-row">
+            <button class="btn-feed upvote" onclick="submitFeedback(1)">🔥 This is Top Tier</button>
+            <button class="btn-feed downvote" onclick="submitFeedback(-1)">💩 This is Trash</button>
+        </div>
+
+        <div id="totalDisplay" class="total-box">Total: $0</div>
+    </div>
+    <button style="margin-top:20px; background:none; border:none; color:#555; font-size:0.7em;" onclick="clearMemory()">Clear Learning Data</button>
+</div>
+
+<script>
+const baseHeroes = [
+    { name: "Quincy", price: 585, meta: 4, tags: ["cheap"] },
+    { name: "Silas", price: 1200, meta: 9, tags: ["ice"] },
+    { name: "Gwendolin", price: 970, meta: 7, tags: ["fire"] }
+];
+
+const baseTowers = [
+    { name: "Crossbow Master", price: 27375, meta: 3, tags: ["noob_trap"] },
+    { name: "Icicle Impale", price: 38200, meta: 9, tags: ["ice"] },
+    { name: "The Tack Zone", price: 25850, meta: 7, tags: ["projectile"] }
+];
+
+// Load user-learned scores from local storage
+let userAdjustments = JSON.parse(localStorage.getItem('btd6_meta_learning')) || {};
+
+function init() {
+    const hEl = document.getElementById('heroSelect');
+    const t1El = document.getElementById('tower1');
+    const t2El = document.getElementById('tower2');
+    baseHeroes.forEach((h, i) => hEl.add(new Option(h.name, i)));
+    baseTowers.forEach((t, i) => {
+        t1El.add(new Option(t.name, i));
+        t2El.add(new Option(t.name, i));
+    });
+    updateUI();
+}
+
+function submitFeedback(val) {
+    const h = baseHeroes[document.getElementById('heroSelect').value].name;
+    const t1 = baseTowers[document.getElementById('tower1').value].name;
+    const t2 = baseTowers[document.getElementById('tower2').value].name;
+
+    // Apply learning to specific towers in this combo
+    [h, t1, t2].forEach(name => {
+        userAdjustments[name] = (userAdjustments[name] || 0) + val;
+    });
+
+    localStorage.setItem('btd6_meta_learning', JSON.stringify(userAdjustments));
+    alert("Strategy Learned! The meta ratings for these towers have been updated.");
+    updateUI();
+}
+
+function updateUI() {
+    const h = baseHeroes[document.getElementById('heroSelect').value];
+    const t1 = baseTowers[document.getElementById('tower1').value];
+    const t2 = baseTowers[document.getElementById('tower2').value];
+
+    // Calculate current scores with learned adjustments
+    const getScore = (item) => item.meta + (userAdjustments[item.name] || 0);
+    const totalScore = (getScore(h) * 1.5) + getScore(t1) + getScore(t2);
+
+    let grade = totalScore > 30 ? "S" : totalScore > 24 ? "A" : totalScore > 18 ? "B" : "C";
+    if (totalScore < 12) grade = "D";
+
+    document.getElementById('gradeDisplay').innerText = grade;
+    document.getElementById('priceReport').innerHTML = `
+        <p>${h.name} (Learned Meta: ${getScore(h)})</p>
+        <p>${t1.name} (Learned Meta: ${getScore(t1)})</p>
+        <p>${t2.name} (Learned Meta: ${getScore(t2)})</p>
+    `;
+
+    const total = h.price + t1.price + t2.price;
+    document.getElementById('totalDisplay').innerText = `Total Cost: $${total.toLocaleString()}`;
+    document.getElementById('analysis').innerText = (userAdjustments[t1.name] < 0) ? "You've marked this tower as weak in the past." : "Analyzing meta...";
+}
+
+function rollRandom() {
+    document.getElementById('heroSelect').selectedIndex = Math.floor(Math.random() * baseHeroes.length);
+    document.getElementById('tower1').selectedIndex = Math.floor(Math.random() * baseTowers.length);
+    document.getElementById('tower2').selectedIndex = Math.floor(Math.random() * baseTowers.length);
+    updateUI();
+}
+
+function clearMemory() { localStorage.removeItem('btd6_meta_learning'); location.reload(); }
+
+init();
+</script>
+</body>
+</html>
