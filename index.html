@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BTD6 Planner - Desperado Update</title>
+    <title>BTD6 Planner - Precise Cash Logic</title>
     <style>
         :root { --primary: #00d1b2; --bg-card: #1a1c23; --bg-body: #0b0e14; --border: #2d333b; }
         .coop-mode { --primary: #ffdd57; --border: #5d4d8a; }
@@ -39,7 +39,7 @@
         <label for="coopToggle">👥 3-Player Co-op (Me & Brother: 2/3 Share)</label>
     </div>
 
-    <div class="section-title">CASH PROJECTOR (2025 UPDATED)</div>
+    <div class="section-title">CASH PROJECTOR (PRECISE 2025 DATA)</div>
     <div class="projector-box">
         <div class="flex-row">
             <div><label>Current Cash</label><input type="number" id="curCash" value="650" oninput="updateUI()"></div>
@@ -105,23 +105,29 @@ const DATA = {
     ]
 };
 
-const ROUND_CASH = { 6:650, 40:16771, 60:51200, 80:98717, 100:178909 };
+// Precise Cumulative Cash Table for BTD6 CHIMPS (Total earned by end of round)
+const CUMULATIVE_CASH = {
+    6: 0, // Starts at R6 with 650/900 in hand
+    7: 172, 8: 356, 9: 610, 10: 864, 11: 1045, 12: 1256, 13: 1547, 14: 1818, 15: 2197, 
+    16: 2542, 17: 2943, 18: 3410, 19: 3821, 20: 4328, 40: 16121, 60: 50550, 80: 98067, 100: 178259
+};
 
 function getCashAtRound(r) {
-    if(ROUND_CASH[r]) return ROUND_CASH[r];
-    let keys = Object.keys(ROUND_CASH).map(Number).sort((a,b)=>a-b);
+    if (CUMULATIVE_CASH[r] !== undefined) return CUMULATIVE_CASH[r];
+    let keys = Object.keys(CUMULATIVE_CASH).map(Number).sort((a,b)=>a-b);
     for(let i=0; i<keys.length-1; i++) {
         if(r > keys[i] && r < keys[i+1]) {
             let percent = (r - keys[i]) / (keys[i+1] - keys[i]);
-            return Math.floor(ROUND_CASH[keys[i]] + (ROUND_CASH[keys[i+1]] - ROUND_CASH[keys[i]]) * percent);
+            return Math.floor(CUMULATIVE_CASH[keys[i]] + (CUMULATIVE_CASH[keys[i+1]] - CUMULATIVE_CASH[keys[i]]) * percent);
         }
     }
-    return r > 100 ? 178909 : 650;
+    return r > 100 ? 178259 : 0;
 }
 
 function toggleCoop() {
     const isCoop = document.getElementById('coopToggle').checked;
     document.getElementById('curCash').value = isCoop ? 900 : 650;
+    document.getElementById('curRound').value = 6;
     updateUI();
 }
 
@@ -131,8 +137,9 @@ function updateUI() {
     const curR = parseInt(document.getElementById('curRound').value) || 6;
     const futR = parseInt(document.getElementById('futRound').value) || 100;
 
-    const teamEarned = getCashAtRound(futR) - getCashAtRound(curR);
-    const myShare = isCoop ? (teamEarned * 0.666) : teamEarned;
+    // Income earned between the two points
+    const earnedTotal = getCashAtRound(futR) - getCashAtRound(curR);
+    const myShare = isCoop ? (earnedTotal * 0.6666) : earnedTotal;
     const totalProjected = curCash + myShare;
 
     document.getElementById('projectionDisplay').innerText = `Projected Wallet: $${Math.floor(totalProjected).toLocaleString()}`;
