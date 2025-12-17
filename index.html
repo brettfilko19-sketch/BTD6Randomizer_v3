@@ -5,21 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BTD6 Ultimate CHIMPS Planner</title>
     <style>
-        :root {
-            --primary: #00d1b2;
-            --bg-card: #1a1c23;
-            --bg-body: #0b0e14;
-            --border: #2d333b;
-        }
-
-        /* Co-op Mode Colors */
-        .coop-mode {
-            --primary: #ffdd57; /* Gold */
-            --border: #5d4d8a; /* Purple accent */
-        }
+        :root { --primary: #00d1b2; --bg-card: #1a1c23; --bg-body: #0b0e14; --border: #2d333b; }
+        .coop-mode { --primary: #ffdd57; --border: #5d4d8a; }
 
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg-body); color: #e0e0e0; padding: 20px; transition: all 0.3s ease; }
-        .container { max-width: 850px; margin: auto; background: var(--bg-card); padding: 25px; border-radius: 12px; border: 2px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.6); position: relative; }
+        .container { max-width: 850px; margin: auto; background: var(--bg-card); padding: 25px; border-radius: 12px; border: 2px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
         
         h2 { color: var(--primary); text-align: center; text-transform: uppercase; margin-bottom: 5px; }
         .subtitle { text-align: center; color: #7a7a7a; font-size: 0.85em; margin-bottom: 20px; }
@@ -30,16 +20,21 @@
         }
         .coop-toggle-container label { color: #fff; margin-left: 10px; cursor: pointer; font-size: 0.9em; font-weight: bold; }
 
+        .section-title { color: var(--primary); font-size: 0.8em; letter-spacing: 1px; margin: 20px 0 10px 0; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+        
         .input-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; color: var(--primary); font-weight: bold; font-size: 0.9em; }
-        select, input[type="number"] { width: 100%; padding: 10px; border-radius: 6px; background: #2d333b; color: white; border: 1px solid #3e444d; cursor: pointer; outline: none; box-sizing: border-box; }
+        select, input[type="number"] { width: 100%; padding: 10px; border-radius: 6px; background: #2d333b; color: white; border: 1px solid #3e444d; outline: none; box-sizing: border-box; }
         
-        .goal-section { background: rgba(0, 0, 0, 0.3); border: 1px dashed var(--primary); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .flex-row { display: flex; gap: 10px; margin-bottom: 15px; }
+        .flex-row div { flex: 1; }
 
-        .btn-random { width: 100%; padding: 15px; background: var(--primary); color: #0b0e14; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 20px; transition: 0.2s; }
-        .btn-random:hover { opacity: 0.9; transform: scale(1.01); }
+        .projector-box { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-top: 10px; }
+        .projection-result { font-size: 1.2em; color: var(--primary); text-align: center; font-weight: bold; }
+
+        .btn-random { width: 100%; padding: 12px; background: var(--primary); color: #0b0e14; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 20px; }
         
-        .summary { background: #0b0e14; padding: 20px; border-radius: 10px; border-left: 5px solid var(--primary); }
+        .summary { background: #0b0e14; padding: 20px; border-radius: 10px; border-left: 5px solid var(--primary); margin-top: 20px; }
         .total-box { font-size: 1.8em; text-align: center; margin-top: 10px; padding: 15px; border-radius: 8px; font-weight: bold; }
         
         .under-budget { border: 2px solid #00d1b2; color: #00d1b2; background: rgba(0, 209, 178, 0.05); }
@@ -47,41 +42,55 @@
         .coop-warning { border: 2px solid #ffdd57; color: #ffdd57; background: rgba(255, 221, 87, 0.05); }
 
         .cost-row { display: flex; justify-content: space-between; border-bottom: 1px solid #2d333b; padding: 8px 0; font-size: 0.95em; }
-        optgroup { background: #1a1c23; color: var(--primary); }
     </style>
 </head>
 <body id="mainBody">
 
-<div class="container" id="mainContainer">
+<div class="container">
     <h2>CHIMPS Strategy Planner</h2>
     <div class="subtitle" id="modeSubtitle">Single Player Mode</div>
 
     <div class="coop-toggle-container">
         <input type="checkbox" id="coopToggle" onchange="toggleCoop()">
-        <label for="coopToggle">👥 3-Player Co-op (2/3 Cash)</label>
+        <label for="coopToggle">👥 3-Player Co-op (Me & Brother: 2/3 Cash)</label>
     </div>
-    
-    <button class="btn-random" onclick="rollRandom()">🎲 ROLL RANDOM STRATEGY</button>
+
+    <div class="section-title">CASH PROJECTOR (EXACT ROUND DATA)</div>
+    <div class="projector-box">
+        <div class="flex-row">
+            <div>
+                <label>Current Cash</label>
+                <input type="number" id="curCash" value="0" oninput="updateUI()">
+            </div>
+            <div>
+                <label>Current Round</label>
+                <input type="number" id="curRound" value="6" min="6" max="100" oninput="updateUI()">
+            </div>
+            <div>
+                <label>Future Round</label>
+                <input type="number" id="futRound" value="100" min="6" max="100" oninput="updateUI()">
+            </div>
+        </div>
+        <div id="projectionDisplay" class="projection-result">Projected Wallet: $0</div>
+    </div>
+
+    <div class="section-title">BUILD PLANNER</div>
+    <button class="btn-random" onclick="rollRandom()">🎲 RANDOM T5 BUILD</button>
 
     <div class="input-group">
         <label>Hero Selection:</label>
         <select id="heroSelect" onchange="updateUI()"></select>
     </div>
 
-    <div class="input-group">
-        <label>Primary/Military T5:</label>
-        <select id="tower1" onchange="updateUI()"></select>
-    </div>
-
-    <div class="input-group">
-        <label>Magic/Support T5:</label>
-        <select id="tower2" onchange="updateUI()"></select>
-    </div>
-
-    <div class="goal-section">
-        <label>Target Round Goal (6-100):</label>
-        <input type="number" id="targetRound" value="100" min="6" max="100" oninput="updateUI()">
-        <div id="roundInfo" style="font-size: 0.85em; color: var(--primary); margin-top: 8px; font-weight: bold;"></div>
+    <div class="flex-row">
+        <div class="input-group">
+            <label>Primary/Military T5:</label>
+            <select id="tower1" onchange="updateUI()"></select>
+        </div>
+        <div class="input-group">
+            <label>Magic/Support T5:</label>
+            <select id="tower2" onchange="updateUI()"></select>
+        </div>
     </div>
 
     <div class="summary">
@@ -92,6 +101,20 @@
 </div>
 
 <script>
+// Exact cumulative cash at the end of each round in CHIMPS
+const CUMULATIVE_CASH = {
+    6: 650, 7: 902, 8: 1222, 9: 1582, 10: 1914, 11: 2244, 12: 2568, 13: 2928, 14: 3242, 15: 3612,
+    16: 3998, 17: 4390, 18: 4796, 19: 5192, 20: 5546, 21: 5970, 22: 6334, 23: 6736, 24: 7034, 25: 7514,
+    26: 7922, 27: 8448, 28: 8870, 29: 9248, 30: 9706, 31: 10146, 32: 10740, 33: 11252, 34: 11956, 35: 12690,
+    36: 13278, 37: 14092, 38: 14934, 39: 15724, 40: 16400, 41: 17294, 42: 18196, 43: 19138, 44: 20002, 45: 21102,
+    46: 21976, 47: 23140, 48: 24328, 49: 25612, 50: 27076, 51: 28358, 52: 29752, 53: 31050, 54: 32670, 55: 34220,
+    56: 35742, 57: 37234, 58: 39144, 59: 40854, 60: 42426, 61: 44040, 62: 45788, 63: 48330, 64: 50064, 65: 52140,
+    66: 53942, 67: 56196, 68: 58002, 69: 60236, 70: 62410, 71: 64580, 72: 67220, 73: 69704, 74: 73062, 75: 76542,
+    76: 78564, 77: 81422, 78: 84412, 79: 88470, 80: 91104, 81: 94523, 82: 98114, 83: 102008, 84: 106456, 85: 110904,
+    86: 114660, 87: 119028, 88: 123490, 89: 128178, 90: 131754, 91: 136270, 92: 141699, 93: 146194, 94: 152648, 95: 157585,
+    96: 165682, 97: 169643, 98: 178220, 99: 181519, 100: 183155
+};
+
 const DATA = {
     heroes: [
         { name: "Quincy", price: 585 }, { name: "Gwen", price: 970 }, { name: "Obyn", price: 700 },
@@ -100,120 +123,55 @@ const DATA = {
         { name: "Sauda", price: 650 }, { name: "Psi", price: 1080 }, { name: "Geraldo", price: 1325 }, 
         { name: "Corvus", price: 1325 }, { name: "Silas", price: 1200 }, { name: "Rosalia", price: 1100 }
     ],
-    P: [
-        { name: "Dart: Ultra-Jugg", price: 18740 }, { name: "Dart: PMFC", price: 53700 }, { name: "Dart: XBM", price: 27375 },
-        { name: "Boomer: Glaive Lord", price: 42100 }, { name: "Boomer: Perma Charge", price: 41250 }, { name: "Boomer: MOAB Dom", price: 63500 },
-        { name: "Bomb: Bloon Crush", price: 61000 }, { name: "Bomb: MOAB Elim", price: 31500 }, { name: "Bomb: Bomb Blitz", price: 40500 },
-        { name: "Tack: Inferno Ring", price: 55500 }, { name: "Tack: S-Maelstrom", price: 18500 }, { name: "Tack: Tack Zone", price: 25850 },
-        { name: "Ice: Super Brittle", price: 38500 }, { name: "Ice: Absolute Zero", price: 26000 }, { name: "Ice: Icicle Impale", price: 38200 },
-        { name: "Glue: Bloon Solver", price: 31000 }, { name: "Glue: Glue Storm", price: 19500 }, { name: "Glue: Super Glue", price: 35000 }
-    ],
-    M: [
-        { name: "Sniper: Cripple MOAB", price: 45000 }, { name: "Sniper: Elite Sniper", price: 21500 }, { name: "Sniper: Elite Defender", price: 17500 },
-        { name: "Sub: Energizer", price: 37000 }, { name: "Sub: Pre-Emptive", price: 43000 }, { name: "Sub: Sub Commander", price: 34000 },
-        { name: "Ace: Sky Shredder", price: 46100 }, { name: "Ace: Tsar Bomba", price: 38000 }, { name: "Ace: Big Plane", price: 102000 },
-        { name: "Heli: Apache Prime", price: 58000 }, { name: "Heli: Com. Commander", price: 38000 }, { name: "Heli: Special Poperations", price: 32000 },
-        { name: "Dartling: Ray of Doom", price: 112000 }, { name: "Dartling: M.A.D", price: 72000 }, { name: "Dartling: B.E.Z", price: 62000 }
-    ],
-    G: [
-        { name: "Wizard: Archmage", price: 42500 }, { name: "Wizard: WLP", price: 65000 }, { name: "Wizard: Prince Darkness", price: 31800 },
-        { name: "Super: True Sun God", price: 650000 }, { name: "Super: Anti-Bloon", price: 103000 }, { name: "Super: Legend of Night", price: 255000 },
-        { name: "Ninja: Grandmaster", price: 52000 }, { name: "Ninja: Grand Saboteur", price: 25000 }, { name: "Ninja: Master Bomber", price: 44000 },
-        { name: "Alch: Permabrew", price: 72000 }, { name: "Alch: Total Transfo", price: 51000 }, { name: "Alch: BMA", price: 54000 },
-        { name: "Druid: Superstorm", price: 75000 }, { name: "Druid: Spirit Forest", price: 48000 }, { name: "Druid: Avatar Wrath", price: 52000 },
-        { name: "Mermonkey: Abyss Lord", price: 34500 }, { name: "Mermonkey: Popseidon", price: 48000 }, { name: "Mermonkey: Final Harmonic", price: 41200 }
-    ],
-    S: [
-        { name: "Spike: Super Mines", price: 162500 }, { name: "Spike: Carpet Spikes", price: 45000 }, { name: "Spike: Perma-Spike", price: 39500 },
-        { name: "Village: Primary Expert", price: 32000 }, { name: "Village: Homeland", price: 55000 }, { name: "Village: Monkeyopolis", price: 15000 },
-        { name: "Engi: Sent. Champion", price: 36000 }, { name: "Engi: Ultraboost", price: 115000 }, { name: "Engi: XXXL Trap", price: 62000 },
-        { name: "Beast: Megalodon", price: 65000 }, { name: "Beast: Pouākai", price: 48000 }, { name: "Beast: Giganotosaurus", price: 82000 }
-    ]
+    P: [{ name: "Dart: Ultra-Jugg", price: 18740 }, { name: "Dart: PMFC", price: 53700 }, { name: "Dart: XBM", price: 27375 }, { name: "Boomer: Glaive Lord", price: 42100 }, { name: "Boomer: Perma Charge", price: 41250 }, { name: "Boomer: MOAB Dom", price: 63500 }, { name: "Bomb: Bloon Crush", price: 61000 }, { name: "Bomb: MOAB Elim", price: 31500 }, { name: "Bomb: Bomb Blitz", price: 40500 }, { name: "Tack: Inferno Ring", price: 55500 }, { name: "Tack: S-Maelstrom", price: 18500 }, { name: "Tack: Tack Zone", price: 25850 }, { name: "Ice: Super Brittle", price: 38500 }, { name: "Ice: Absolute Zero", price: 26000 }, { name: "Ice: Icicle Impale", price: 38200 }, { name: "Glue: Bloon Solver", price: 31000 }, { name: "Glue: Glue Storm", price: 19500 }, { name: "Glue: Super Glue", price: 35000 }],
+    M: [{ name: "Sniper: Cripple MOAB", price: 45000 }, { name: "Sniper: Elite Sniper", price: 21500 }, { name: "Sniper: Elite Defender", price: 17500 }, { name: "Sub: Energizer", price: 37000 }, { name: "Sub: Pre-Emptive", price: 43000 }, { name: "Sub: Sub Commander", price: 34000 }, { name: "Ace: Sky Shredder", price: 46100 }, { name: "Ace: Tsar Bomba", price: 38000 }, { name: "Ace: Big Plane", price: 102000 }, { name: "Heli: Apache Prime", price: 58000 }, { name: "Heli: Com. Commander", price: 38000 }, { name: "Heli: Special Poperations", price: 32000 }, { name: "Dartling: Ray of Doom", price: 112000 }, { name: "Dartling: M.A.D", price: 72000 }, { name: "Dartling: B.E.Z", price: 62000 }],
+    G: [{ name: "Wizard: Archmage", price: 42500 }, { name: "Wizard: WLP", price: 65000 }, { name: "Wizard: Prince Darkness", price: 31800 }, { name: "Super: True Sun God", price: 650000 }, { name: "Super: Anti-Bloon", price: 103000 }, { name: "Super: Legend of Night", price: 255000 }, { name: "Ninja: Grandmaster", price: 52000 }, { name: "Ninja: Grand Saboteur", price: 25000 }, { name: "Ninja: Master Bomber", price: 44000 }, { name: "Alch: Permabrew", price: 72000 }, { name: "Alch: Total Transfo", price: 51000 }, { name: "Alch: BMA", price: 54000 }, { name: "Druid: Superstorm", price: 75000 }, { name: "Druid: Spirit Forest", price: 48000 }, { name: "Druid: Avatar Wrath", price: 52000 }, { name: "Mermonkey: Abyss Lord", price: 34500 }, { name: "Mermonkey: Popseidon", price: 48000 }, { name: "Mermonkey: Final Harmonic", price: 41200 }],
+    S: [{ name: "Spike: Super Mines", price: 162500 }, { name: "Spike: Carpet Spikes", price: 45000 }, { name: "Spike: Perma-Spike", price: 39500 }, { name: "Village: Primary Expert", price: 32000 }, { name: "Village: Homeland", price: 55000 }, { name: "Village: Monkeyopolis", price: 15000 }, { name: "Engi: Sent. Champion", price: 36000 }, { name: "Engi: Ultraboost", price: 115000 }, { name: "Engi: XXXL Trap", price: 62000 }, { name: "Beast: Megalodon", price: 65000 }, { name: "Beast: Pouākai", price: 48000 }, { name: "Beast: Giganotosaurus", price: 82000 }]
 };
+
+function getExactMapTotal(round) {
+    if (round < 6) return 0;
+    if (round > 100) return 183155;
+    return CUMULATIVE_CASH[round] || 0;
+}
 
 function toggleCoop() {
     const isCoop = document.getElementById('coopToggle').checked;
-    const body = document.getElementById('mainBody');
-    const sub = document.getElementById('modeSubtitle');
-
-    if (isCoop) {
-        body.classList.add('coop-mode');
-        sub.innerText = "Co-op Mode (Pooling 2/3 Cash)";
-    } else {
-        body.classList.remove('coop-mode');
-        sub.innerText = "Single Player Mode";
-    }
+    document.getElementById('mainBody').classList.toggle('coop-mode', isCoop);
+    document.getElementById('modeSubtitle').innerText = isCoop ? "Co-op Mode (Pooling 2/3 Cash)" : "Single Player Mode";
     updateUI();
 }
 
-function populate() {
-    const hSelect = document.getElementById('heroSelect');
-    const t1Select = document.getElementById('tower1');
-    const t2Select = document.getElementById('tower2');
-
-    DATA.heroes.forEach((h, i) => hSelect.add(new Option(`${h.name} ($${h.price})`, i)));
-    
-    const groups = [
-        { select: t1Select, label: "PRIMARY", key: "P" },
-        { select: t1Select, label: "MILITARY", key: "M" },
-        { select: t2Select, label: "MAGIC", key: "G" },
-        { select: t2Select, label: "SUPPORT", key: "S" }
-    ];
-
-    groups.forEach(group => {
-        const g = document.createElement('optgroup');
-        g.label = group.label;
-        DATA[group.key].forEach((t, i) => {
-            g.appendChild(new Option(t.name, group.key + i));
-        });
-        group.select.appendChild(g);
-    });
-}
-
-function getTowerData(val) {
-    if (!val) return { name: "None", price: 0 };
-    const prefix = val.charAt(0);
-    const index = parseInt(val.substring(1));
-    return (DATA[prefix] && DATA[prefix][index]) ? DATA[prefix][index] : { name: "Unknown", price: 0 };
-}
-
 function updateUI() {
-    const hIdx = document.getElementById('heroSelect').value;
-    const t1Val = document.getElementById('tower1').value;
-    const t2Val = document.getElementById('tower2').value;
     const isCoop = document.getElementById('coopToggle').checked;
-    const target = parseInt(document.getElementById('targetRound').value) || 6;
+    const curCash = parseFloat(document.getElementById('curCash').value) || 0;
+    const curR = parseInt(document.getElementById('curRound').value) || 6;
+    const futR = parseInt(document.getElementById('futRound').value) || 100;
 
-    const hero = DATA.heroes[hIdx] || { name: "None", price: 0 };
-    const t1 = getTowerData(t1Val);
-    const t2 = getTowerData(t2Val);
-
-    const totalCost = Number(hero.price) + Number(t1.price) + Number(t2.price);
+    // PROJECTOR LOGIC
+    // Calculate total earned income from current round end to future round end
+    const totalNewIncome = getExactMapTotal(futR) - getExactMapTotal(curR);
+    const myIncomeShare = isCoop ? (totalNewIncome * 0.666) : totalNewIncome;
+    const finalProjected = curCash + myIncomeShare;
     
-    let myCashShare = 0;
+    document.getElementById('projectionDisplay').innerText = `Projected Wallet: $${Math.floor(finalProjected).toLocaleString()}`;
 
-    if (!isCoop) {
-        const soloStart = 650;
-        if (target <= 6) myCashShare = soloStart;
-        else if (target <= 40) myCashShare = soloStart + ((target - 6) / 34) * (14200 - soloStart);
-        else if (target <= 60) myCashShare = 14200 + ((target - 40) / 20) * 24300;
-        else if (target <= 80) myCashShare = 38500 + ((target - 60) / 20) * 46000;
-        else myCashShare = 84500 + ((target - 80) / 20) * 94400;
+    // BUILD PLANNER LOGIC
+    const hIdx = document.getElementById('heroSelect').value;
+    const hero = DATA.heroes[hIdx] || { price: 0 };
+    const t1 = getTowerData(document.getElementById('tower1').value);
+    const t2 = getTowerData(document.getElementById('tower2').value);
+    const totalCost = Number(hero.price) + Number(t1.price) + Number(t2.price);
+
+    // Total Budget check from start of game (R6)
+    // Co-op starting bonus: $450 * 2 = $900. Solo: $650.
+    let budgetCap = 0;
+    if (isCoop) {
+        const teamEarnedAfterR6 = getExactMapTotal(futR) - 650;
+        budgetCap = 900 + (teamEarnedAfterR6 * 0.666);
     } else {
-        const coopStartPerPerson = 450;
-        const myTeamStart = coopStartPerPerson * 2; 
-        let totalMapEarned = 0;
-        if (target > 6) {
-            if (target <= 40) totalMapEarned = ((target - 6) / 34) * (14200 - 650);
-            else if (target <= 60) totalMapEarned = (14200 - 650) + ((target - 40) / 20) * 24300;
-            else if (target <= 80) totalMapEarned = (38500 - 650) + ((target - 60) / 20) * 46000;
-            else totalMapEarned = (84500 - 650) + ((target - 80) / 20) * 94400;
-        }
-        myCashShare = myTeamStart + (totalMapEarned * 0.666);
+        budgetCap = getExactMapTotal(futR);
     }
-
-    const displayRoundCash = Math.floor(myCashShare);
-    document.getElementById('roundInfo').innerText = `Combined Share by R${target}: ~$${displayRoundCash.toLocaleString()}`;
 
     document.getElementById('priceReport').innerHTML = `
         <div class="cost-row"><span>${hero.name}</span><span>$${hero.price.toLocaleString()}</span></div>
@@ -223,23 +181,39 @@ function updateUI() {
 
     const totalBox = document.getElementById('totalDisplay');
     const advice = document.getElementById('saveupAdvice');
-    
     totalBox.innerText = `Total: $${totalCost.toLocaleString()}`;
-    totalBox.className = "total-box";
-
-    if (totalCost > myCashShare) {
-        totalBox.classList.add('over-budget');
-        advice.innerHTML = `<span style='color:#ff3860'>🚨 SAVE-UP FAIL:</span> Short by $${Math.floor(totalCost - myCashShare).toLocaleString()}.`;
+    totalBox.className = "total-box " + (totalCost > budgetCap ? "over-budget" : (isCoop ? "coop-warning" : "under-budget"));
+    
+    if (totalCost > budgetCap) {
+        advice.innerHTML = `🚨 Short by $${Math.floor(totalCost - budgetCap).toLocaleString()} for a R${futR} build.`;
     } else {
-        totalBox.classList.add(isCoop ? 'coop-warning' : 'under-budget');
-        advice.innerHTML = `<span style='color:${isCoop ? "#ffdd57" : "#00d1b2"}'>✅ ON TRACK:</span> $${Math.floor(myCashShare - totalCost).toLocaleString()} surplus!`;
+        advice.innerHTML = `✅ Fits Round ${futR} budget with $${Math.floor(budgetCap - totalCost).toLocaleString()} surplus.`;
     }
+}
+
+function getTowerData(val) {
+    if (!val) return { name: "None", price: 0 };
+    return DATA[val.charAt(0)][parseInt(val.substring(1))] || { name: "None", price: 0 };
+}
+
+function populate() {
+    const hSelect = document.getElementById('heroSelect');
+    DATA.heroes.forEach((h, i) => hSelect.add(new Option(`${h.name} ($${h.price})`, i)));
+    ['tower1', 'tower2'].forEach(id => {
+        const sel = document.getElementById(id);
+        const groups = [{l:"PRIMARY", k:"P"}, {l:"MILITARY", k:"M"}, {l:"MAGIC", k:"G"}, {l:"SUPPORT", k:"S"}];
+        groups.forEach(group => {
+            const g = document.createElement('optgroup'); g.label = group.l;
+            DATA[group.k].forEach((t, i) => g.appendChild(new Option(t.name, group.k + i)));
+            sel.appendChild(g);
+        });
+    });
 }
 
 function rollRandom() {
     document.getElementById('heroSelect').selectedIndex = Math.floor(Math.random() * DATA.heroes.length);
-    document.getElementById('tower1').selectedIndex = Math.floor(Math.random() * document.getElementById('tower1').options.length);
-    document.getElementById('tower2').selectedIndex = Math.floor(Math.random() * document.getElementById('tower2').options.length);
+    document.getElementById('tower1').selectedIndex = Math.floor(Math.random() * 30);
+    document.getElementById('tower2').selectedIndex = Math.floor(Math.random() * 30);
     updateUI();
 }
 
