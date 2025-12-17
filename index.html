@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BTD6 Planner - Precise Cash Logic</title>
+    <title>BTD6 Precise Planner - 2025 Roster</title>
     <style>
         :root { --primary: #00d1b2; --bg-card: #1a1c23; --bg-body: #0b0e14; --border: #2d333b; }
         .coop-mode { --primary: #ffdd57; --border: #5d4d8a; }
@@ -39,7 +39,7 @@
         <label for="coopToggle">👥 3-Player Co-op (2/3 Share)</label>
     </div>
 
-    <div class="section-title">CASH PROJECTOR (PRECISE 2025 DATA)</div>
+    <div class="section-title">PRECISION CASH PROJECTOR</div>
     <div class="projector-box">
         <div class="flex-row">
             <div><label>Current Cash</label><input type="number" id="curCash" value="650" oninput="updateUI()"></div>
@@ -77,9 +77,9 @@ const DATA = {
         {name:"Psi", price:1080}, {name:"Geraldo", price:1325}, {name:"Corvus", price:1325}, {name:"Rosalia", price:1100}, {name:"Silas", price:1200}
     ],
     P: [
-        {name:"Desperado: Blazing Sun (Top)", price:38400},
-        {name:"Desperado: Golden Justice (Mid)", price:54000},
-        {name:"Desperado: Desert Phantom (Bot)", price:42600},
+        {name:"Desperado: Blazing Sun" price:38400},
+        {name:"Desperado: Golden Justice", price:54000},
+        {name:"Desperado: Desert Phantom", price:42600},
         {name:"Dart: Ultra-Jugg", price:18740}, {name:"Dart: PMFC", price:53700}, {name:"Dart: XBM", price:27375},
         {name:"Boomer: Glaive Lord", price:42100}, {name:"Boomer: MOAB Dom", price:63500},
         {name:"Bomb: Bloon Crush", price:61000}, {name:"Bomb: Bomb Blitz", price:40500},
@@ -105,23 +105,37 @@ const DATA = {
     ]
 };
 
-// Precise Cumulative Cash Table for BTD6 CHIMPS (Total earned by end of round)
-const CUMULATIVE_CASH = {
-    6: 0, // Starts at R6 with 650/900 in hand
-    7: 172, 8: 356, 9: 610, 10: 864, 11: 1045, 12: 1256, 13: 1547, 14: 1818, 15: 2197, 
-    16: 2542, 17: 2943, 18: 3410, 19: 3821, 20: 4328, 40: 16121, 60: 50550, 80: 98067, 100: 178259
+// PRECISE BTD6 CHIMPS TOTAL INCOME PER ROUND END
+// Represents cumulative money earned FROM Round 6 onward.
+const CHIMPS_CUMULATIVE = {
+    6: 0, 7: 163, 8: 347, 9: 601, 10: 855, 11: 1036, 12: 1247, 13: 1538, 14: 1809, 
+    15: 2188, 16: 2533, 17: 2934, 18: 3401, 19: 3812, 20: 4319, 21: 4768, 22: 5214, 
+    23: 5621, 24: 5971, 25: 6418, 26: 6867, 27: 7451, 28: 8069, 29: 8617, 30: 9239, 
+    31: 9875, 32: 10582, 33: 11283, 34: 12154, 35: 12977, 36: 13998, 37: 15004, 
+    38: 16223, 39: 17316, 40: 18452, 41: 19693, 42: 21105, 43: 22442, 44: 23610, 
+    45: 25032, 46: 26343, 47: 28066, 48: 29774, 49: 31597, 50: 33490, 51: 35147, 
+    52: 36761, 53: 38407, 54: 40167, 55: 41846, 56: 43599, 57: 45318, 58: 47253, 
+    59: 48943, 60: 50645, 61: 52402, 62: 54181, 63: 55850, 64: 57606, 65: 59463, 
+    66: 61286, 67: 63148, 68: 64966, 69: 66804, 70: 68686, 71: 70550, 72: 72477, 
+    73: 74363, 74: 76326, 75: 78248, 76: 80108, 77: 82065, 78: 84084, 79: 86095, 
+    80: 88152, 81: 90240, 82: 92437, 83: 94676, 84: 96739, 85: 98863, 86: 100989, 
+    87: 103214, 88: 105436, 89: 107693, 90: 109968, 91: 112196, 92: 114488, 93: 116744, 
+    94: 119099, 95: 121408, 96: 123868, 97: 126282, 98: 128912, 99: 131518, 100: 178909
 };
 
 function getCashAtRound(r) {
-    if (CUMULATIVE_CASH[r] !== undefined) return CUMULATIVE_CASH[r];
-    let keys = Object.keys(CUMULATIVE_CASH).map(Number).sort((a,b)=>a-b);
+    if (r <= 6) return 0;
+    if (CHIMPS_CUMULATIVE[r] !== undefined) return CHIMPS_CUMULATIVE[r];
+    
+    // Safety fallback for intermediate calculation
+    let keys = Object.keys(CHIMPS_CUMULATIVE).map(Number).sort((a,b)=>a-b);
     for(let i=0; i<keys.length-1; i++) {
         if(r > keys[i] && r < keys[i+1]) {
             let percent = (r - keys[i]) / (keys[i+1] - keys[i]);
-            return Math.floor(CUMULATIVE_CASH[keys[i]] + (CUMULATIVE_CASH[keys[i+1]] - CUMULATIVE_CASH[keys[i]]) * percent);
+            return Math.floor(CHIMPS_CUMULATIVE[keys[i]] + (CHIMPS_CUMULATIVE[keys[i+1]] - CHIMPS_CUMULATIVE[keys[i]]) * percent);
         }
     }
-    return r > 100 ? 178259 : 0;
+    return r > 100 ? 178909 : 0;
 }
 
 function toggleCoop() {
@@ -137,7 +151,6 @@ function updateUI() {
     const curR = parseInt(document.getElementById('curRound').value) || 6;
     const futR = parseInt(document.getElementById('futRound').value) || 100;
 
-    // Income earned between the two points
     const earnedTotal = getCashAtRound(futR) - getCashAtRound(curR);
     const myShare = isCoop ? (earnedTotal * 0.6666) : earnedTotal;
     const totalProjected = curCash + myShare;
@@ -146,7 +159,8 @@ function updateUI() {
     document.getElementById('modeSubtitle').innerText = isCoop ? "Co-op Mode (2/3 Team Share)" : "Single Player Mode";
     document.getElementById('mainBody').classList.toggle('coop-mode', isCoop);
 
-    const hero = DATA.heroes[document.getElementById('heroSelect').value];
+    const heroVal = document.getElementById('heroSelect').value;
+    const hero = DATA.heroes[heroVal] || DATA.heroes[0];
     const t1 = getTower(document.getElementById('tower1').value);
     const t2 = getTower(document.getElementById('tower2').value);
     const cost = hero.price + t1.price + t2.price;
@@ -168,35 +182,15 @@ function updateUI() {
 
 function getTower(val) {
     if(!val) return {name:"None", price:0};
-    return DATA[val[0]][val.substring(1)];
+    return DATA[val[0]][val.substring(1)] || {name:"None", price:0};
 }
 
 function populate() {
     const hSel = document.getElementById('heroSelect');
+    hSel.innerHTML = "";
     DATA.heroes.forEach((h, i) => hSel.add(new Option(`${h.name} ($${h.price})`, i)));
+    
     ['tower1', 'tower2'].forEach(id => {
         const s = document.getElementById(id);
-        const cats = [{l:"Primary", k:"P"}, {l:"Military", k:"M"}, {l:"Magic", k:"G"}, {l:"Support", k:"S"}];
-        cats.forEach(c => {
-            const g = document.createElement('optgroup'); g.label = c.l;
-            DATA[c.k].forEach((t, i) => g.appendChild(new Option(t.name, c.k + i)));
-            s.appendChild(g);
-        });
-    });
-}
-
-function rollRandom() {
-    document.getElementById('heroSelect').selectedIndex = Math.floor(Math.random() * DATA.heroes.length);
-    ['tower1', 'tower2'].forEach(id => {
-        const cats = ['P', 'M', 'G', 'S'];
-        const cat = cats[Math.floor(Math.random() * 4)];
-        document.getElementById(id).value = cat + Math.floor(Math.random() * DATA[cat].length);
-    });
-    updateUI();
-}
-
-populate();
-updateUI();
-</script>
-</body>
-</html>
+        s.innerHTML = "";
+        const cats = [{l:"Primary", k:"P"}, {l:"
