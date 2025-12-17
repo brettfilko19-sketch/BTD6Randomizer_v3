@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BTD6 Ultimate Planner - Search & Desperado</title>
+    <title>BTD6 Ultimate Planner - Desperado Update</title>
     <style>
         :root { --primary: #00d1b2; --bg-card: #1a1c23; --bg-body: #0b0e14; --border: #2d333b; }
         .coop-mode { --primary: #ffdd57; --border: #5d4d8a; }
@@ -15,8 +15,7 @@
         .coop-toggle-container label { color: #fff; margin-left: 10px; cursor: pointer; font-size: 0.9em; font-weight: bold; }
         .section-title { color: var(--primary); font-size: 0.8em; letter-spacing: 1px; margin: 20px 0 10px 0; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
         label { display: block; margin-bottom: 5px; color: var(--primary); font-weight: bold; font-size: 0.9em; }
-        select, input[type="number"], input[type="text"] { width: 100%; padding: 10px; border-radius: 6px; background: #2d333b; color: white; border: 1px solid #3e444d; outline: none; box-sizing: border-box; margin-bottom: 10px; }
-        input[type="text"]:focus { border-color: var(--primary); }
+        select, input[type="number"] { width: 100%; padding: 10px; border-radius: 6px; background: #2d333b; color: white; border: 1px solid #3e444d; outline: none; box-sizing: border-box; margin-bottom: 10px; }
         .flex-row { display: flex; gap: 15px; margin-bottom: 10px; }
         .flex-row div { flex: 1; }
         .projector-box { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
@@ -27,7 +26,6 @@
         .under-budget { border: 2px solid #00d1b2; color: #00d1b2; background: rgba(0, 209, 178, 0.05); }
         .over-budget { border: 2px solid #ff3860; color: #ff3860; background: rgba(255, 56, 96, 0.05); }
         .cost-row { display: flex; justify-content: space-between; border-bottom: 1px solid #2d333b; padding: 8px 0; font-size: 0.95em; }
-        .search-container { margin-bottom: 20px; position: relative; }
     </style>
 </head>
 <body id="mainBody">
@@ -39,11 +37,6 @@
     <div class="coop-toggle-container">
         <input type="checkbox" id="coopToggle" onchange="toggleCoop()">
         <label for="coopToggle">👥 3-Player Co-op (2/3 Share)</label>
-    </div>
-
-    <div class="section-title">QUICK SEARCH</div>
-    <div class="search-container">
-        <input type="text" id="towerSearch" placeholder="Type to filter heroes and towers (e.g. 'Desperado')..." oninput="populate()">
     </div>
 
     <div class="section-title">CASH PROJECTOR (2025 VERIFIED)</div>
@@ -79,7 +72,7 @@
 const DATA = {
     heroes: [
         {name:"Quincy", price:585}, {name:"Gwendolin", price:970}, {name:"Striker Jones", price:810}, {name:"Obyn Greenfoot", price:700},
-        {name:"Captain Churchill", price:2160}, {name:"Ezili", price:650}, {name:"Pat Fusty", price:865},
+        {name:"Captain Churchill", price:2160}, {name:"Benjamin", price:1295}, {name:"Ezili", price:650}, {name:"Pat Fusty", price:865},
         {name:"Adora", price:1080}, {name:"Admiral Brickell", price:970}, {name:"Etienne", price:920}, {name:"Sauda", price:650},
         {name:"Psi", price:1080}, {name:"Geraldo", price:1325}, {name:"Corvus", price:1325}, {name:"Rosalia", price:1100}, {name:"Silas", price:1200}
     ],
@@ -152,13 +145,9 @@ function updateUI() {
     document.getElementById('modeSubtitle').innerText = isCoop ? "Co-op Mode (2/3 Team Share)" : "Single Player Mode";
     document.getElementById('mainBody').classList.toggle('coop-mode', isCoop);
 
-    const heroVal = document.getElementById('heroSelect').value;
-    const t1Val = document.getElementById('tower1').value;
-    const t2Val = document.getElementById('tower2').value;
-
-    const hero = DATA.heroes[heroVal] || {name:"N/A", price:0};
-    const t1 = getTower(t1Val);
-    const t2 = getTower(t2Val);
+    const hero = DATA.heroes[document.getElementById('heroSelect').value];
+    const t1 = getTower(document.getElementById('tower1').value);
+    const t2 = getTower(document.getElementById('tower2').value);
     const cost = hero.price + t1.price + t2.price;
 
     document.getElementById('priceReport').innerHTML = `
@@ -178,54 +167,24 @@ function updateUI() {
 
 function getTower(val) {
     if(!val) return {name:"None", price:0};
-    return DATA[val[0]][val.substring(1)] || {name:"None", price:0};
+    return DATA[val[0]][val.substring(1)];
 }
 
 function populate() {
-    const searchTerm = document.getElementById('towerSearch').value.toLowerCase();
-    
-    // Populate Hero Select
     const hSel = document.getElementById('heroSelect');
-    const currentHero = hSel.value;
-    hSel.innerHTML = "";
-    DATA.heroes.forEach((h, i) => {
-        if(h.name.toLowerCase().includes(searchTerm)) {
-            let opt = new Option(`${h.name} ($${h.price})`, i);
-            if(i == currentHero) opt.selected = true;
-            hSel.add(opt);
-        }
-    });
-
-    // Populate Tower Selects
+    DATA.heroes.forEach((h, i) => hSel.add(new Option(`${h.name} ($${h.price})`, i)));
     ['tower1', 'tower2'].forEach(id => {
         const s = document.getElementById(id);
-        const currentVal = s.value;
-        s.innerHTML = "";
         const cats = [{l:"Primary", k:"P"}, {l:"Military", k:"M"}, {l:"Magic", k:"G"}, {l:"Support", k:"S"}];
         cats.forEach(c => {
-            const filteredTowers = DATA[c.k].filter(t => t.name.toLowerCase().includes(searchTerm));
-            if(filteredTowers.length > 0) {
-                const g = document.createElement('optgroup'); 
-                g.label = c.l;
-                DATA[c.k].forEach((t, i) => {
-                    if(t.name.toLowerCase().includes(searchTerm)) {
-                        let opt = new Option(t.name, c.k + i);
-                        if((c.k + i) == currentVal) opt.selected = true;
-                        g.appendChild(opt);
-                    }
-                });
-                s.appendChild(g);
-            }
+            const g = document.createElement('optgroup'); g.label = c.l;
+            DATA[c.k].forEach((t, i) => g.appendChild(new Option(t.name, c.k + i)));
+            s.appendChild(g);
         });
     });
-    updateUI();
 }
 
 function rollRandom() {
-    // Clear search before rolling to ensure all options are available
-    document.getElementById('towerSearch').value = "";
-    populate();
-
     document.getElementById('heroSelect').selectedIndex = Math.floor(Math.random() * DATA.heroes.length);
     const cats = ['P', 'M', 'G', 'S'];
     [1, 2].forEach(num => {
