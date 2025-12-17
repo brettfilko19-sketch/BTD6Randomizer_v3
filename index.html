@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BTD6 Precise Planner - Milestone Edition</title>
+    <title>BTD6 Precise Planner - Tower Focus</title>
     <style>
         :root { --primary: #00d1b2; --bg-card: #1a1c23; --bg-body: #0b0e14; --border: #2d333b; --accent: #3298dc; }
         .coop-mode { --primary: #ffdd57; --border: #5d4d8a; }
@@ -26,8 +26,6 @@
         .under-budget { border: 2px solid #00d1b2; color: #00d1b2; background: rgba(0, 209, 178, 0.05); }
         .over-budget { border: 2px solid #ff3860; color: #ff3860; background: rgba(255, 56, 96, 0.05); }
         .cost-row { display: flex; justify-content: space-between; border-bottom: 1px solid #2d333b; padding: 8px 0; font-size: 0.95em; }
-        
-        /* Milestone Styling */
         .milestone-container { background: #12141a; border-radius: 8px; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
         .milestone-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #1c1f26; border-radius: 4px; border-left: 4px solid var(--accent); }
         .ms-label { font-size: 0.9em; font-weight: bold; }
@@ -59,10 +57,7 @@
     <button class="btn-random" onclick="rollRandom()">🎲 RANDOMIZE BUILD</button>
 
     <div class="flex-row">
-        <div style="flex: 2;">
-            <label>Hero:</label>
-            <select id="heroSelect" onchange="updateUI()"></select>
-        </div>
+        <div><label>Hero (Reference Only):</label><select id="heroSelect" onchange="updateUI()"></select></div>
     </div>
 
     <div class="flex-row">
@@ -76,9 +71,8 @@
         <div id="saveupAdvice" style="margin-top:15px; font-style: italic; color: #95a5a6; text-align: center;"></div>
     </div>
 
-    <div class="section-title">🕒 PURCHASE TIMELINE (AFFORDABILITY)</div>
-    <div class="milestone-container" id="milestoneList">
-        </div>
+    <div class="section-title">🕒 TOWER AFFORDABILITY TIMELINE</div>
+    <div class="milestone-container" id="milestoneList"></div>
 </div>
 
 <script>
@@ -94,31 +88,38 @@ const DATA = {
         {name:"Desperado: Golden Justice", price:54000},
         {name:"Desperado: Desert Phantom", price:42600},
         {name:"Dart: Ultra-Jugg", price:18740}, {name:"Dart: PMFC", price:53700}, {name:"Dart: XBM", price:27375},
-        {name:"Boomer: Glaive Lord", price:42100}, {name:"Boomer: MOAB Dom", price:63500},
-        {name:"Bomb: Bloon Crush", price:61000}, {name:"Bomb: Bomb Blitz", price:40500},
-        {name:"Tack: Inferno Ring", price:55500}, {name:"Tack: Zone", price:25850},
-        {name:"Ice: Icicle Impale", price:38200}, {name:"Glue: Solver", price:31000}
+        {name:"Boomer: Glaive Lord", price:42100}, {name:"Boomer: P-Charge", price:38400}, {name:"Boomer: MOAB Dom", price:63500},
+        {name:"Bomb: Bloon Crush", price:61000}, {name:"Bomb: Eliminator", price:29100}, {name:"Bomb: Blitz", price:40500},
+        {name:"Tack: Inferno Ring", price:55500}, {name:"Tack: S-Maelstrom", price:17500}, {name:"Tack: Zone", price:25850},
+        {name:"Ice: Super Brittle", price:32800}, {name:"Ice: Absolute Zero", price:21600}, {name:"Ice: Icicle Impale", price:38200},
+        {name:"Glue: Solver", price:31000}, {name:"Glue: Storm", price:19400}, {name:"Glue: Super Glue", price:33100}
     ],
     M: [
-        {name:"Sniper: Elite Def", price:17500}, {name:"Sub: Pre-Emptive", price:43000},
-        {name:"Sub: Sub Commander", price:34000}, {name:"Boat: Flagship", price:38000},
-        {name:"Ace: Sky Shredder", price:46100}, {name:"Ace: Flying Fortress", price:102000},
-        {name:"Heli: Apache Prime", price:58000}, {name:"Heli: Com. Commander", price:38000},
-        {name:"Dartling: Ray of Doom", price:112000}, {name:"Dartling: BEZ", price:62000}
+        {name:"Sniper: Cripple MOAB", price:41000}, {name:"Sniper: Elite Sniper", price:17300}, {name:"Sniper: Elite Def", price:17500},
+        {name:"Sub: Energizer", price:36800}, {name:"Sub: Pre-Emptive", price:43000}, {name:"Sub: Sub Commander", price:34000},
+        {name:"Boat: Flagship", price:38000}, {name:"Boat: Pirate Lord", price:22800}, {name:"Boat: Trade Empire", price:24100},
+        {name:"Ace: Sky Shredder", price:46100}, {name:"Ace: Tsar Bomba", price:32400}, {name:"Ace: Flying Fortress", price:102000},
+        {name:"Heli: Apache Prime", price:58000}, {name:"Heli: Special Poperations", price:32400}, {name:"Heli: Com. Commander", price:38000},
+        {name:"Mortar: Biggest One", price:33400}, {name:"Mortar: Pop and Awe", price:36200}, {name:"Mortar: Blooncineration", price:45500},
+        {name:"Dartling: Ray of Doom", price:112000}, {name:"Dartling: M.A.D", price:69000}, {name:"Dartling: B.E.Z", price:62000}
     ],
     G: [
-        {name:"Wizard: Prince Darkness", price:31800}, {name:"Super: Anti-Bloon", price:103000},
-        {name:"Ninja: Grandmaster", price:52000}, {name:"Ninja: Master Bomber", price:44000},
-        {name:"Druid: Spirit Forest", price:48000}, {name:"Druid: Avatar Wrath", price:52000},
-        {name:"Mermonkey: Popseidon", price:48000}
+        {name:"Desperado: Blazing Sun", price:38400}, {name:"Desperado: Golden Justice", price:54000}, {name:"Desperado: Desert Phantom", price:42600},
+        {name:"Wizard: Archmage", price:34200}, {name:"Wizard: WLP", price:58000}, {name:"Wizard: PoD", price:31800},
+        {name:"Super: True Sun God", price:585000}, {name:"Super: Anti-Bloon", price:103000}, {name:"Super: LotN", price:245000},
+        {name:"Ninja: Grandmaster", price:52000}, {name:"Ninja: Saboteur", price:25600}, {name:"Ninja: Master Bomber", price:44000},
+        {name:"Alch: Permabrew", price:72000}, {name:"Alch: Total Trans.", price:51000}, {name:"Alch: BMA", price:54000},
+        {name:"Druid: Superstorm", price:68000}, {name:"Druid: Spirit Forest", price:48000}, {name:"Druid: Avatar Wrath", price:52000},
+        {name:"Mermonkey: Lord of Abyss", price:36000}, {name:"Mermonkey: Popseidon", price:48000}, {name:"Mermonkey: Final Harmonic", price:42000}
     ],
     S: [
-        {name:"Spike: Perma-Spike", price:39500}, {name:"Village: Prim. Expert", price:32000},
-        {name:"Engi: Sentry Champion", price:36000}, {name:"Beast: Pouākai", price:48000}
+        {name:"Spike: S-Mines", price:118000}, {name:"Spike: Carpet Spikes", price:34000}, {name:"Spike: Perma-Spike", price:39500},
+        {name:"Village: Prim. Expert", price:32000}, {name:"Village: Homeland", price:43200}, {name:"Village: Monkeyopolis", price:15000},
+        {name:"Engi: Sentry Champion", price:36000}, {name:"Engi: Ultraboost", price:101000}, {name:"Engi: XXXL Trap", price:58000},
+        {name:"Beast: Megalodon", price:66400}, {name:"Beast: Pouākai", price:48000}, {name:"Beast: Giganotosaurus", price:89900}
     ]
 };
 
-// PRECISE BTD6 CHIMPS TOTAL INCOME PER ROUND END
 const CHIMPS_CUMULATIVE = {
     6: 0, 7: 163, 8: 347, 9: 601, 10: 855, 11: 1036, 12: 1247, 13: 1538, 14: 1809, 
     15: 2188, 16: 2533, 17: 2934, 18: 3401, 19: 3812, 20: 4319, 21: 4768, 22: 5214, 
@@ -138,7 +139,6 @@ const CHIMPS_CUMULATIVE = {
 function getCashAtRound(r) {
     if (r <= 6) return 0;
     if (CHIMPS_CUMULATIVE[r] !== undefined) return CHIMPS_CUMULATIVE[r];
-    // Interpolation fallback for safety
     let keys = Object.keys(CHIMPS_CUMULATIVE).map(Number).sort((a,b)=>a-b);
     for(let i=0; i<keys.length-1; i++) {
         if(r > keys[i] && r < keys[i+1]) {
@@ -189,38 +189,36 @@ function updateUI() {
     const costTotal = costHero + costT1 + costT2;
 
     document.getElementById('priceReport').innerHTML = `
-        <div class="cost-row"><span>${hero.name}</span><span>$${costHero.toLocaleString()}</span></div>
+        <div class="cost-row"><span>${hero.name} (Ref)</span><span>$${costHero.toLocaleString()}</span></div>
         <div class="cost-row"><span>${t1.name}</span><span>$${costT1.toLocaleString()}</span></div>
         <div class="cost-row"><span>${t2.name}</span><span>$${costT2.toLocaleString()}</span></div>
     `;
 
     const totalBox = document.getElementById('totalDisplay');
-    totalBox.innerText = `Total Build: $${costTotal.toLocaleString()}`;
+    totalBox.innerText = `Build Total: $${costTotal.toLocaleString()}`;
     totalBox.className = "total-box " + (costTotal > totalProjected ? "over-budget" : "under-budget");
 
     document.getElementById('saveupAdvice').innerHTML = costTotal > totalProjected 
         ? `🚨 Short by $${Math.floor(costTotal - totalProjected).toLocaleString()}`
         : `✅ Affordable! Surplus: $${Math.floor(totalProjected - costTotal).toLocaleString()}`;
 
-    // Calculate Milestones
-    const rHero = findRoundForPrice(costHero, curCash, curR, isCoop);
-    const rT1 = findRoundForPrice(costHero + costT1, curCash, curR, isCoop);
-    const rT2 = findRoundForPrice(costHero + costT2, curCash, curR, isCoop); // Standalone T2 after Hero
-    const rFull = findRoundForPrice(costTotal, curCash, curR, isCoop);
+    // Timeline logic excluding Hero cost
+    const rT1 = findRoundForPrice(costT1, curCash, curR, isCoop);
+    const rT2 = findRoundForPrice(costT2, curCash, curR, isCoop);
+    const rBoth = findRoundForPrice(costT1 + costT2, curCash, curR, isCoop);
 
-    const mList = document.getElementById('milestoneList');
-    mList.innerHTML = `
-        <div class="milestone-item">
-            <span class="ms-label">Afford ${hero.name}:</span>
-            <span class="ms-round">${rHero ? 'Round ' + rHero : '<span class="ms-impossible">Too Expensive</span>'}</span>
-        </div>
+    document.getElementById('milestoneList').innerHTML = `
         <div class="milestone-item">
             <span class="ms-label">Afford ${t1.name}:</span>
             <span class="ms-round">${rT1 ? 'Round ' + rT1 : '<span class="ms-impossible">Too Expensive</span>'}</span>
         </div>
         <div class="milestone-item">
-            <span class="ms-label">Afford Full Build:</span>
-            <span class="ms-round">${rFull ? 'Round ' + rFull : '<span class="ms-impossible">Out of Budget</span>'}</span>
+            <span class="ms-label">Afford ${t2.name}:</span>
+            <span class="ms-round">${rT2 ? 'Round ' + rT2 : '<span class="ms-impossible">Too Expensive</span>'}</span>
+        </div>
+        <div class="milestone-item" style="border-left-color: #00d1b2;">
+            <span class="ms-label">Afford BOTH Towers:</span>
+            <span class="ms-round">${rBoth ? 'Round ' + rBoth : '<span class="ms-impossible">Out of Budget</span>'}</span>
         </div>
     `;
 }
@@ -234,7 +232,6 @@ function populate() {
     const hSel = document.getElementById('heroSelect');
     hSel.innerHTML = "";
     DATA.heroes.forEach((h, i) => hSel.add(new Option(`${h.name} ($${h.price})`, i)));
-    
     ['tower1', 'tower2'].forEach(id => {
         const s = document.getElementById(id);
         s.innerHTML = "";
