@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BTD6 Ultimate Planner - Full Roster</title>
+    <title>BTD6 Ultimate Planner - Desperado Update</title>
     <style>
         :root { --primary: #00d1b2; --bg-card: #1a1c23; --bg-body: #0b0e14; --border: #2d333b; }
         .coop-mode { --primary: #ffdd57; --border: #5d4d8a; }
@@ -39,7 +39,7 @@
         <label for="coopToggle">👥 3-Player Co-op (2/3 Share)</label>
     </div>
 
-    <div class="section-title">CASH PROJECTOR (VERIFIED 2025)</div>
+    <div class="section-title">CASH PROJECTOR (2025 VERIFIED)</div>
     <div class="projector-box">
         <div class="flex-row">
             <div><label>Current Cash</label><input type="number" id="curCash" value="650" oninput="updateUI()"></div>
@@ -91,7 +91,8 @@ const DATA = {
         {name:"Ace: Sky Shredder", price:46100}, {name:"Ace: Tsar Bomba", price:38000}, {name:"Ace: Flying Fortress", price:102000},
         {name:"Heli: Apache Prime", price:58000}, {name:"Heli: Special Poperat.", price:32000}, {name:"Heli: Com. Commander", price:38000},
         {name:"Mortar: The Biggest One", price:38000}, {name:"Mortar: Pop and Awe", price:35000}, {name:"Mortar: Blooncineration", price:48000},
-        {name:"Dartling: Ray of Doom", price:112000}, {name:"Dartling: MAD", price:72000}, {name:"Dartling: BEZ", price:62000}
+        {name:"Dartling: Ray of Doom", price:112000}, {name:"Dartling: MAD", price:72000}, {name:"Dartling: BEZ", price:62000},
+        {name:"Dartling: DESPERADO", price:54000}
     ],
     G: [
         {name:"Wizard: Archmage", price:42500}, {name:"Wizard: WLP", price:65000}, {name:"Wizard: Prince Darkness", price:31800},
@@ -136,12 +137,7 @@ function updateUI() {
     const curR = parseInt(document.getElementById('curRound').value) || 6;
     const futR = parseInt(document.getElementById('futRound').value) || 100;
 
-    // In Co-op, the cumulative income starts at $650 baseline but you get $900 personal start.
-    // Income earned is from Round 6 end ($650) to Future Round.
-    const teamEarnedSinceR6End = getCashAtRound(futR) - 650;
     const teamEarnedSinceCurrentRound = getCashAtRound(futR) - getCashAtRound(curR);
-    
-    // Logic: Current Cash + (Future Income * 2/3 share)
     const myShare = isCoop ? (teamEarnedSinceCurrentRound * 0.666) : teamEarnedSinceCurrentRound;
     const totalProjected = curCash + myShare;
 
@@ -161,7 +157,7 @@ function updateUI() {
     `;
 
     const totalBox = document.getElementById('totalDisplay');
-    totalBox.innerText = `Total Build Cost: $${cost.toLocaleString()}`;
+    totalBox.innerText = `Total Cost: $${cost.toLocaleString()}`;
     totalBox.className = "total-box " + (cost > totalProjected ? "over-budget" : "under-budget");
 
     document.getElementById('saveupAdvice').innerHTML = cost > totalProjected 
