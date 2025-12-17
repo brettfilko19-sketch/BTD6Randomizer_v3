@@ -2,131 +2,242 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>BTD6 Learning Meta Planner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTD6 Ultimate CHIMPS Planner</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: #e0e0e0; padding: 20px; }
-        .container { max-width: 800px; margin: auto; background: #16213e; padding: 25px; border-radius: 12px; border: 1px solid #0f3460; }
-        h2 { color: #4ecca3; text-align: center; text-transform: uppercase; }
-        select { width: 100%; padding: 12px; margin-top: 10px; background: #0f3460; color: white; border-radius: 6px; border: 1px solid #1a1a2e; }
-        .btn-random { width: 100%; padding: 15px; margin-bottom: 20px; background: #4ecca3; font-weight: bold; border-radius: 8px; cursor: pointer; }
-        
-        /* Feedback Buttons */
-        .feedback-row { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-feed { flex: 1; padding: 10px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; color: white; }
-        .upvote { background: #2ecc71; }
-        .downvote { background: #e74c3c; }
+        :root {
+            --primary: #00d1b2;
+            --bg-card: #1a1c23;
+            --bg-body: #0b0e14;
+            --border: #2d333b;
+        }
 
-        .summary { margin-top: 20px; padding: 20px; background: #0f3460; border-radius: 8px; border-left: 5px solid #4ecca3; position: relative; }
-        .grade-badge { position: absolute; top: 10px; right: 20px; font-size: 3em; font-weight: 900; }
-        .analysis-text { color: #95a5a6; font-style: italic; margin-top: 10px; }
-        .total-box { font-size: 1.5em; text-align: center; margin-top: 15px; font-weight: bold; }
+        /* Co-op Mode Colors */
+        .coop-mode {
+            --primary: #ffdd57; /* Gold */
+            --border: #5d4d8a; /* Purple accent */
+        }
+
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg-body); color: #e0e0e0; padding: 20px; transition: all 0.3s ease; }
+        .container { max-width: 850px; margin: auto; background: var(--bg-card); padding: 25px; border-radius: 12px; border: 2px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.6); position: relative; }
+        
+        h2 { color: var(--primary); text-align: center; text-transform: uppercase; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #7a7a7a; font-size: 0.85em; margin-bottom: 20px; }
+        
+        .coop-toggle-container {
+            display: flex; justify-content: center; align-items: center; 
+            margin-bottom: 20px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;
+        }
+        .coop-toggle-container label { color: #fff; margin-left: 10px; cursor: pointer; font-size: 0.9em; font-weight: bold; }
+
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: var(--primary); font-weight: bold; font-size: 0.9em; }
+        select, input[type="number"] { width: 100%; padding: 10px; border-radius: 6px; background: #2d333b; color: white; border: 1px solid #3e444d; box-sizing: border-box; outline: none; }
+        
+        .goal-section { background: rgba(0, 0, 0, 0.3); border: 1px dashed var(--primary); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        
+        .btn-random { width: 100%; padding: 15px; background: var(--primary); color: #0b0e14; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 20px; transition: 0.2s; }
+        .btn-random:hover { opacity: 0.9; transform: scale(1.01); }
+        
+        .summary { background: #0b0e14; padding: 20px; border-radius: 10px; border-left: 5px solid var(--primary); }
+        .total-box { font-size: 1.8em; text-align: center; margin-top: 10px; padding: 15px; border-radius: 8px; font-weight: bold; }
+        
+        .under-budget { border: 2px solid #00d1b2; color: #00d1b2; background: rgba(0, 209, 178, 0.05); }
+        .over-budget { border: 2px solid #ff3860; color: #ff3860; background: rgba(255, 56, 96, 0.05); }
+        .coop-warning { border: 2px solid #ffdd57; color: #ffdd57; background: rgba(255, 221, 87, 0.05); }
+
+        .cost-row { display: flex; justify-content: space-between; border-bottom: 1px solid #2d333b; padding: 8px 0; font-size: 0.95em; }
+        optgroup { background: #1a1c23; color: var(--primary); }
     </style>
 </head>
-<body>
+<body id="mainBody">
 
-<div class="container">
-    <h2>Learning Meta Planner</h2>
+<div class="container" id="mainContainer">
+    <h2>CHIMPS Strategy Planner</h2>
+    <div class="subtitle" id="modeSubtitle">Single Player Mode</div>
+
+    <div class="coop-toggle-container">
+        <input type="checkbox" id="coopToggle" onchange="toggleCoop()">
+        <label for="coopToggle">👥 3-Player Co-op (Me & Brother: 2/3 Cash)</label>
+    </div>
+    
     <button class="btn-random" onclick="rollRandom()">🎲 ROLL RANDOM STRATEGY</button>
 
-    <label>Hero:</label>
-    <select id="heroSelect" onchange="updateUI()"></select>
-    <label>Tower 1:</label>
-    <select id="tower1" onchange="updateUI()"></select>
-    <label>Tower 2:</label>
-    <select id="tower2" onchange="updateUI()"></select>
+    <div class="input-group">
+        <label>Hero Selection:</label>
+        <select id="heroSelect" onchange="updateUI()"></select>
+    </div>
+
+    <div class="input-group">
+        <label>Primary/Military T5:</label>
+        <select id="tower1" onchange="updateUI()"></select>
+    </div>
+
+    <div class="input-group">
+        <label>Magic/Support T5:</label>
+        <select id="tower2" onchange="updateUI()"></select>
+    </div>
+
+    <div class="goal-section">
+        <label>Target Round Goal (6-100):</label>
+        <input type="number" id="targetRound" value="100" min="6" max="100" oninput="updateUI()">
+        <div id="roundInfo" style="font-size: 0.85em; color: var(--primary); margin-top: 8px; font-weight: bold;"></div>
+    </div>
 
     <div class="summary">
-        <div id="gradeDisplay" class="grade-badge">?</div>
         <div id="priceReport"></div>
-        <div id="analysis" class="analysis-text"></div>
-        
-        <div class="feedback-row">
-            <button class="btn-feed upvote" onclick="submitFeedback(1)">🔥 This is Top Tier</button>
-            <button class="btn-feed downvote" onclick="submitFeedback(-1)">💩 This is Trash</button>
-        </div>
-
         <div id="totalDisplay" class="total-box">Total: $0</div>
+        <div id="saveupAdvice" style="margin-top:15px; font-style: italic; color: #95a5a6; text-align: center;"></div>
     </div>
-    <button style="margin-top:20px; background:none; border:none; color:#555; font-size:0.7em;" onclick="clearMemory()">Clear Learning Data</button>
 </div>
 
 <script>
-const baseHeroes = [
-    { name: "Quincy", price: 585, meta: 4, tags: ["cheap"] },
-    { name: "Silas", price: 1200, meta: 9, tags: ["ice"] },
-    { name: "Gwendolin", price: 970, meta: 7, tags: ["fire"] }
-];
+const DATA = {
+    heroes: [
+        { name: "Quincy", price: 585 }, { name: "Gwen", price: 970 }, { name: "Obyn", price: 700 },
+        { name: "Churchill", price: 2160 }, { name: "Ezili", price: 650 }, { name: "Pat Fusty", price: 865 }, 
+        { name: "Adora", price: 1080 }, { name: "Admiral Brickell", price: 970 }, { name: "Etienne", price: 920 }, 
+        { name: "Sauda", price: 650 }, { name: "Psi", price: 1080 }, { name: "Geraldo", price: 1325 }, 
+        { name: "Corvus", price: 1325 }, { name: "Silas", price: 1200 }, { name: "Rosalia", price: 1100 }
+    ],
+    P: [
+        { name: "Dart: Ultra-Jugg", price: 18740 }, { name: "Dart: PMFC", price: 53700 }, { name: "Dart: XBM", price: 27375 },
+        { name: "Boomer: Glaive Lord", price: 42100 }, { name: "Boomer: Perma Charge", price: 41250 }, { name: "Boomer: MOAB Dom", price: 63500 },
+        { name: "Bomb: Bloon Crush", price: 61000 }, { name: "Bomb: MOAB Elim", price: 31500 }, { name: "Bomb: Bomb Blitz", price: 40500 },
+        { name: "Tack: Inferno Ring", price: 55500 }, { name: "Tack: S-Maelstrom", price: 18500 }, { name: "Tack: Tack Zone", price: 25850 },
+        { name: "Ice: Super Brittle", price: 38500 }, { name: "Ice: Absolute Zero", price: 26000 }, { name: "Ice: Icicle Impale", price: 38200 },
+        { name: "Glue: Bloon Solver", price: 31000 }, { name: "Glue: Glue Storm", price: 19500 }, { name: "Glue: Super Glue", price: 35000 }
+    ],
+    M: [
+        { name: "Sniper: Cripple MOAB", price: 45000 }, { name: "Sniper: Elite Sniper", price: 21500 }, { name: "Sniper: Elite Defender", price: 17500 },
+        { name: "Sub: Energizer", price: 37000 }, { name: "Sub: Pre-Emptive", price: 43000 }, { name: "Sub: Sub Commander", price: 34000 },
+        { name: "Ace: Sky Shredder", price: 46100 }, { name: "Ace: Tsar Bomba", price: 38000 }, { name: "Ace: Big Plane", price: 102000 },
+        { name: "Heli: Apache Prime", price: 58000 }, { name: "Heli: Com. Commander", price: 38000 }, { name: "Heli: Special Poperations", price: 32000 },
+        { name: "Dartling: Ray of Doom", price: 112000 }, { name: "Dartling: M.A.D", price: 72000 }, { name: "Dartling: B.E.Z", price: 62000 }
+    ],
+    G: [
+        { name: "Wizard: Archmage", price: 42500 }, { name: "Wizard: WLP", price: 65000 }, { name: "Wizard: Prince Darkness", price: 31800 },
+        { name: "Super: True Sun God", price: 650000 }, { name: "Super: Anti-Bloon", price: 103000 }, { name: "Super: Legend of Night", price: 255000 },
+        { name: "Ninja: Grandmaster", price: 52000 }, { name: "Ninja: Grand Saboteur", price: 25000 }, { name: "Ninja: Master Bomber", price: 44000 },
+        { name: "Alch: Permabrew", price: 72000 }, { name: "Alch: Total Transfo", price: 51000 }, { name: "Alch: BMA", price: 54000 },
+        { name: "Druid: Superstorm", price: 75000 }, { name: "Druid: Spirit Forest", price: 48000 }, { name: "Druid: Avatar Wrath", price: 52000 },
+        { name: "Mermonkey: Abyss Lord", price: 34500 }, { name: "Mermonkey: Popseidon", price: 48000 }, { name: "Mermonkey: Final Harmonic", price: 41200 }
+    ],
+    S: [
+        { name: "Spike: Super Mines", price: 162500 }, { name: "Spike: Carpet Spikes", price: 45000 }, { name: "Spike: Perma-Spike", price: 39500 },
+        { name: "Village: Primary Expert", price: 32000 }, { name: "Village: Homeland", price: 55000 }, { name: "Village: Monkeyopolis", price: 15000 },
+        { name: "Engi: Sent. Champion", price: 36000 }, { name: "Engi: Ultraboost", price: 115000 }, { name: "Engi: XXXL Trap", price: 62000 },
+        { name: "Beast: Megalodon", price: 65000 }, { name: "Beast: Pouākai", price: 48000 }, { name: "Beast: Giganotosaurus", price: 82000 }
+    ]
+};
 
-const baseTowers = [
-    { name: "Crossbow Master", price: 27375, meta: 3, tags: ["noob_trap"] },
-    { name: "Icicle Impale", price: 38200, meta: 9, tags: ["ice"] },
-    { name: "The Tack Zone", price: 25850, meta: 7, tags: ["projectile"] }
-];
+function toggleCoop() {
+    const isCoop = document.getElementById('coopToggle').checked;
+    const body = document.getElementById('mainBody');
+    const sub = document.getElementById('modeSubtitle');
 
-// Load user-learned scores from local storage
-let userAdjustments = JSON.parse(localStorage.getItem('btd6_meta_learning')) || {};
-
-function init() {
-    const hEl = document.getElementById('heroSelect');
-    const t1El = document.getElementById('tower1');
-    const t2El = document.getElementById('tower2');
-    baseHeroes.forEach((h, i) => hEl.add(new Option(h.name, i)));
-    baseTowers.forEach((t, i) => {
-        t1El.add(new Option(t.name, i));
-        t2El.add(new Option(t.name, i));
-    });
+    if (isCoop) {
+        body.classList.add('coop-mode');
+        sub.innerText = "Co-op Mode (Pooling 2/3 Cash)";
+    } else {
+        body.classList.remove('coop-mode');
+        sub.innerText = "Single Player Mode";
+    }
     updateUI();
 }
 
-function submitFeedback(val) {
-    const h = baseHeroes[document.getElementById('heroSelect').value].name;
-    const t1 = baseTowers[document.getElementById('tower1').value].name;
-    const t2 = baseTowers[document.getElementById('tower2').value].name;
+function populate() {
+    const hSelect = document.getElementById('heroSelect');
+    const t1Select = document.getElementById('tower1');
+    const t2Select = document.getElementById('tower2');
 
-    // Apply learning to specific towers in this combo
-    [h, t1, t2].forEach(name => {
-        userAdjustments[name] = (userAdjustments[name] || 0) + val;
+    DATA.heroes.forEach((h, i) => hSelect.add(new Option(`${h.name} ($${h.price})`, i)));
+    
+    const groups = [
+        { select: t1Select, label: "PRIMARY", key: "P" },
+        { select: t1Select, label: "MILITARY", key: "M" },
+        { select: t2Select, label: "MAGIC", key: "G" },
+        { select: t2Select, label: "SUPPORT", key: "S" }
+    ];
+
+    groups.forEach(group => {
+        const g = document.createElement('optgroup');
+        g.label = group.label;
+        DATA[group.key].forEach((t, i) => {
+            g.appendChild(new Option(t.name, group.key + i));
+        });
+        group.select.appendChild(g);
     });
+}
 
-    localStorage.setItem('btd6_meta_learning', JSON.stringify(userAdjustments));
-    alert("Strategy Learned! The meta ratings for these towers have been updated.");
-    updateUI();
+function getTowerData(val) {
+    if (!val) return { name: "None", price: 0 };
+    const prefix = val.charAt(0);
+    const index = parseInt(val.substring(1));
+    return (DATA[prefix] && DATA[prefix][index]) ? DATA[prefix][index] : { name: "Unknown", price: 0 };
 }
 
 function updateUI() {
-    const h = baseHeroes[document.getElementById('heroSelect').value];
-    const t1 = baseTowers[document.getElementById('tower1').value];
-    const t2 = baseTowers[document.getElementById('tower2').value];
+    const hIdx = document.getElementById('heroSelect').value;
+    const t1Val = document.getElementById('tower1').value;
+    const t2Val = document.getElementById('tower2').value;
+    const isCoop = document.getElementById('coopToggle').checked;
+    const target = parseInt(document.getElementById('targetRound').value) || 100;
 
-    // Calculate current scores with learned adjustments
-    const getScore = (item) => item.meta + (userAdjustments[item.name] || 0);
-    const totalScore = (getScore(h) * 1.5) + getScore(t1) + getScore(t2);
+    const hero = DATA.heroes[hIdx] || { name: "None", price: 0 };
+    const t1 = getTowerData(t1Val);
+    const t2 = getTowerData(t2Val);
 
-    let grade = totalScore > 30 ? "S" : totalScore > 24 ? "A" : totalScore > 18 ? "B" : "C";
-    if (totalScore < 12) grade = "D";
+    const total = Number(hero.price) + Number(t1.price) + Number(t2.price);
+    
+    // Estimate total map cash for round
+    let totalMapCash = 0;
+    if (target <= 40) totalMapCash = (target/40) * 14200;
+    else if (target <= 60) totalMapCash = 14200 + ((target-40)/20) * 24300;
+    else if (target <= 80) totalMapCash = 38500 + ((target-60)/20) * 46000;
+    else if (target <= 100) totalMapCash = 84500 + ((target-80)/20) * 94400;
 
-    document.getElementById('gradeDisplay').innerText = grade;
+    // Adjust share based on co-op
+    const myCashShare = isCoop ? (totalMapCash * 0.666) : totalMapCash;
+    const displayRoundCash = Math.floor(myCashShare);
+
+    document.getElementById('roundInfo').innerText = `Your Share by R${target}: ~$${displayRoundCash.toLocaleString()}`;
+
     document.getElementById('priceReport').innerHTML = `
-        <p>${h.name} (Learned Meta: ${getScore(h)})</p>
-        <p>${t1.name} (Learned Meta: ${getScore(t1)})</p>
-        <p>${t2.name} (Learned Meta: ${getScore(t2)})</p>
+        <div class="cost-row"><span>${hero.name}</span><span>$${hero.price.toLocaleString()}</span></div>
+        <div class="cost-row"><span>${t1.name}</span><span>$${t1.price.toLocaleString()}</span></div>
+        <div class="cost-row"><span>${t2.name}</span><span>$${t2.price.toLocaleString()}</span></div>
     `;
 
-    const total = h.price + t1.price + t2.price;
-    document.getElementById('totalDisplay').innerText = `Total Cost: $${total.toLocaleString()}`;
-    document.getElementById('analysis').innerText = (userAdjustments[t1.name] < 0) ? "You've marked this tower as weak in the past." : "Analyzing meta...";
+    const totalBox = document.getElementById('totalDisplay');
+    const advice = document.getElementById('saveupAdvice');
+    
+    totalBox.innerText = `Total: $${total.toLocaleString()}`;
+    totalBox.className = "total-box";
+
+    if (total > myCashShare) {
+        totalBox.classList.add('over-budget');
+        const diff = Math.floor(total - myCashShare);
+        advice.innerHTML = `<span style='color:#ff3860'>🚨 SAVE-UP FAIL:</span> Short by $${diff.toLocaleString()} at Round ${target}.`;
+    } else {
+        totalBox.classList.add(isCoop ? 'coop-warning' : 'under-budget');
+        const surplus = Math.floor(myCashShare - total);
+        advice.innerHTML = `<span style='color:${isCoop ? "#ffdd57" : "#00d1b2"}'>✅ ON TRACK:</span> $${surplus.toLocaleString()} surplus for other towers!`;
+    }
 }
 
 function rollRandom() {
-    document.getElementById('heroSelect').selectedIndex = Math.floor(Math.random() * baseHeroes.length);
-    document.getElementById('tower1').selectedIndex = Math.floor(Math.random() * baseTowers.length);
-    document.getElementById('tower2').selectedIndex = Math.floor(Math.random() * baseTowers.length);
+    const hSelect = document.getElementById('heroSelect');
+    const t1Select = document.getElementById('tower1');
+    const t2Select = document.getElementById('tower2');
+    hSelect.selectedIndex = Math.floor(Math.random() * hSelect.options.length);
+    t1Select.selectedIndex = Math.floor(Math.random() * t1Select.options.length);
+    t2Select.selectedIndex = Math.floor(Math.random() * t2Select.options.length);
     updateUI();
 }
 
-function clearMemory() { localStorage.removeItem('btd6_meta_learning'); location.reload(); }
-
-init();
+populate();
+updateUI();
 </script>
 </body>
 </html>
