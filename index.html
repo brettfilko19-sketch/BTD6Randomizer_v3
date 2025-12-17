@@ -1,253 +1,257 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BTD6 Precise Planner - Tower Focus</title>
-    <style>
-        :root { --primary: #00d1b2; --bg-card: #1a1c23; --bg-body: #0b0e14; --border: #2d333b; --accent: #3298dc; }
-        .coop-mode { --primary: #ffdd57; --border: #5d4d8a; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg-body); color: #e0e0e0; padding: 20px; line-height: 1.4; }
-        .container { max-width: 900px; margin: auto; background: var(--bg-card); padding: 25px; border-radius: 12px; border: 2px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
-        h2 { color: var(--primary); text-align: center; text-transform: uppercase; margin-bottom: 5px; }
-        .subtitle { text-align: center; color: #7a7a7a; font-size: 0.85em; margin-bottom: 20px; }
-        .coop-toggle-container { display: flex; justify-content: center; align-items: center; margin-bottom: 20px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; }
-        .coop-toggle-container label { color: #fff; margin-left: 10px; cursor: pointer; font-size: 0.9em; font-weight: bold; }
-        .section-title { color: var(--primary); font-size: 0.8em; letter-spacing: 1px; margin: 20px 0 10px 0; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
-        label { display: block; margin-bottom: 5px; color: var(--primary); font-weight: bold; font-size: 0.9em; }
-        select, input[type="number"] { width: 100%; padding: 10px; border-radius: 6px; background: #2d333b; color: white; border: 1px solid #3e444d; outline: none; box-sizing: border-box; margin-bottom: 10px; }
-        .flex-row { display: flex; gap: 15px; margin-bottom: 10px; }
-        .flex-row div { flex: 1; }
-        .projector-box { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-        .projection-result { font-size: 1.3em; color: var(--primary); text-align: center; font-weight: bold; }
-        .btn-random { width: 100%; padding: 15px; background: var(--primary); color: #0b0e14; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 20px; font-size: 1em; }
-        .summary { background: #0b0e14; padding: 20px; border-radius: 10px; border-left: 5px solid var(--primary); margin-bottom: 20px; }
-        .total-box { font-size: 1.8em; text-align: center; margin-top: 10px; padding: 15px; border-radius: 8px; font-weight: bold; }
-        .under-budget { border: 2px solid #00d1b2; color: #00d1b2; background: rgba(0, 209, 178, 0.05); }
-        .over-budget { border: 2px solid #ff3860; color: #ff3860; background: rgba(255, 56, 96, 0.05); }
-        .cost-row { display: flex; justify-content: space-between; border-bottom: 1px solid #2d333b; padding: 8px 0; font-size: 0.95em; }
-        .milestone-container { background: #12141a; border-radius: 8px; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .milestone-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #1c1f26; border-radius: 4px; border-left: 4px solid var(--accent); }
-        .ms-label { font-size: 0.9em; font-weight: bold; }
-        .ms-round { color: var(--primary); font-weight: bold; font-size: 1.1em; }
-        .ms-impossible { color: #ff3860; font-size: 0.8em; }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTD6 Precise Planner - Tower Focus</title>
+    <style>
+        :root { --primary: #00d1b2; --bg-card: #1a1c23; --bg-body: #0b0e14; --border: #2d333b; --accent: #3298dc; }
+        .coop-mode { --primary: #ffdd57; --border: #5d4d8a; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg-body); color: #e0e0e0; padding: 20px; line-height: 1.4; }
+        .container { max-width: 900px; margin: auto; background: var(--bg-card); padding: 25px; border-radius: 12px; border: 2px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+        h2 { color: var(--primary); text-align: center; text-transform: uppercase; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #7a7a7a; font-size: 0.85em; margin-bottom: 20px; }
+        .coop-toggle-container { display: flex; justify-content: center; align-items: center; margin-bottom: 20px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; }
+        .coop-toggle-container label { color: #fff; margin-left: 10px; cursor: pointer; font-size: 0.9em; font-weight: bold; }
+        .section-title { color: var(--primary); font-size: 0.8em; letter-spacing: 1px; margin: 20px 0 10px 0; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+        label { display: block; margin-bottom: 5px; color: var(--primary); font-weight: bold; font-size: 0.9em; }
+        select, input[type="number"] { width: 100%; padding: 10px; border-radius: 6px; background: #2d333b; color: white; border: 1px solid #3e444d; outline: none; box-sizing: border-box; margin-bottom: 10px; }
+        .flex-row { display: flex; gap: 15px; margin-bottom: 10px; }
+        .flex-row div { flex: 1; }
+        .projector-box { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .projection-result { font-size: 1.3em; color: var(--primary); text-align: center; font-weight: bold; }
+        .btn-random { width: 100%; padding: 15px; background: var(--primary); color: #0b0e14; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 20px; font-size: 1em; }
+        .summary { background: #0b0e14; padding: 20px; border-radius: 10px; border-left: 5px solid var(--primary); margin-bottom: 20px; }
+        .total-box { font-size: 1.8em; text-align: center; margin-top: 10px; padding: 15px; border-radius: 8px; font-weight: bold; }
+        .under-budget { border: 2px solid #00d1b2; color: #00d1b2; background: rgba(0, 209, 178, 0.05); }
+        .over-budget { border: 2px solid #ff3860; color: #ff3860; background: rgba(255, 56, 96, 0.05); }
+        .cost-row { display: flex; justify-content: space-between; border-bottom: 1px solid #2d333b; padding: 8px 0; font-size: 0.95em; }
+        .milestone-container { background: #12141a; border-radius: 8px; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .milestone-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #1c1f26; border-radius: 4px; border-left: 4px solid var(--accent); }
+        .ms-label { font-size: 0.9em; font-weight: bold; }
+        .ms-round { color: var(--primary); font-weight: bold; font-size: 1.1em; }
+        .ms-impossible { color: #ff3860; font-size: 0.8em; }
+    </style>
 </head>
 <body id="mainBody">
 
 <div class="container">
-    <h2>CHIMPS Build Planner</h2>
-    <div class="subtitle" id="modeSubtitle">Single Player Mode</div>
+    <h2>CHIMPS Build Planner</h2>
+    <div class="subtitle" id="modeSubtitle">Single Player Mode</div>
 
-    <div class="coop-toggle-container">
-        <input type="checkbox" id="coopToggle" onchange="toggleCoop()">
-        <label for="coopToggle">👥 3-Player Co-op (2/3 Share)</label>
-    </div>
+    <div class="coop-toggle-container">
+        <input type="checkbox" id="coopToggle" onchange="toggleCoop()">
+        <label for="coopToggle">👥 3-Player Co-op (2/3 Share)</label>
+    </div>
 
-    <div class="section-title">PRECISION CASH PROJECTOR</div>
-    <div class="projector-box">
-        <div class="flex-row">
-            <div><label>Current Cash</label><input type="number" id="curCash" value="650" oninput="updateUI()"></div>
-            <div><label>Current Round</label><input type="number" id="curRound" value="6" min="6" max="100" oninput="updateUI()"></div>
-            <div><label>Target Round</label><input type="number" id="futRound" value="100" min="6" max="100" oninput="updateUI()"></div>
-        </div>
-        <div id="projectionDisplay" class="projection-result">Projected Wallet: $0</div>
-    </div>
+    <div class="section-title">PRECISION CASH PROJECTOR</div>
+    <div class="projector-box">
+        <div class="flex-row">
+            <div><label>Current Cash</label><input type="number" id="curCash" value="650" oninput="updateUI()"></div>
+            <div><label>Current Round</label><input type="number" id="curRound" value="6" min="6" max="100" oninput="updateUI()"></div>
+            <div><label>Target Round</label><input type="number" id="futRound" value="100" min="6" max="100" oninput="updateUI()"></div>
+        </div>
+        <div id="projectionDisplay" class="projection-result">Projected Wallet: $0</div>
+    </div>
 
-    <button class="btn-random" onclick="rollRandom()">🎲 RANDOMIZE BUILD</button>
+    <button class="btn-random" onclick="rollRandom()">🎲 RANDOMIZE BUILD</button>
 
-    <div class="flex-row">
-        <div><label>Hero (Reference Only):</label><select id="heroSelect" onchange="updateUI()"></select></div>
-    </div>
+    <div class="flex-row">
+        <div><label>Hero (Reference Only):</label><select id="heroSelect" onchange="updateUI()"></select></div>
+    </div>
 
-    <div class="flex-row">
-        <div><label>Tower 1:</label><select id="tower1" onchange="updateUI()"></select></div>
-        <div><label>Tower 2:</label><select id="tower2" onchange="updateUI()"></select></div>
-    </div>
+    <div class="flex-row">
+        <div><label>Tower 1:</label><select id="tower1" onchange="updateUI()"></select></div>
+        <div><label>Tower 2:</label><select id="tower2" onchange="updateUI()"></select></div>
+    </div>
 
-    <div class="summary">
-        <div id="priceReport"></div>
-        <div id="totalDisplay" class="total-box">Total: $0</div>
-        <div id="saveupAdvice" style="margin-top:15px; font-style: italic; color: #95a5a6; text-align: center;"></div>
-    </div>
+    <div class="summary">
+        <div id="priceReport"></div>
+        <div id="totalDisplay" class="total-box">Total: $0</div>
+        <div id="saveupAdvice" style="margin-top:15px; font-style: italic; color: #95a5a6; text-align: center;"></div>
+    </div>
 
-    <div class="section-title">🕒 TOWER AFFORDABILITY TIMELINE</div>
-    <div class="milestone-container" id="milestoneList"></div>
+    <div class="section-title">🕒 TOWER AFFORDABILITY TIMELINE</div>
+    <div class="milestone-container" id="milestoneList"></div>
 </div>
 
 <script>
 const DATA = {
-    heroes: [
-        {name:"Quincy", price:585}, {name:"Gwendolin", price:970}, {name:"Striker Jones", price:810}, {name:"Obyn Greenfoot", price:700},
-        {name:"Captain Churchill", price:2160}, {name:"Benjamin", price:1295}, {name:"Ezili", price:650}, {name:"Pat Fusty", price:865},
-        {name:"Adora", price:1080}, {name:"Admiral Brickell", price:970}, {name:"Etienne", price:920}, {name:"Sauda", price:650},
-        {name:"Psi", price:1080}, {name:"Geraldo", price:1325}, {name:"Corvus", price:1325}, {name:"Rosalia", price:1100}, {name:"Silas", price:1200}
-    ],
-    P: [
-        {name:"Desperado: Blazing Sun", price:38400},
-        {name:"Desperado: Golden Justice", price:54000},
-        {name:"Desperado: Desert Phantom", price:42600},
-        {name:"Dart: Ultra-Jugg", price:18740}, {name:"Dart: PMFC", price:53700}, {name:"Dart: XBM", price:27375},
-        {name:"Boomer: Glaive Lord", price:42100}, {name:"Boomer: P-Charge", price:38400}, {name:"Boomer: MOAB Dom", price:63500},
-        {name:"Bomb: Bloon Crush", price:61000}, {name:"Bomb: Eliminator", price:29100}, {name:"Bomb: Blitz", price:40500},
-        {name:"Tack: Inferno Ring", price:55500}, {name:"Tack: S-Maelstrom", price:17500}, {name:"Tack: Zone", price:25850},
-        {name:"Ice: Super Brittle", price:32800}, {name:"Ice: Absolute Zero", price:21600}, {name:"Ice: Icicle Impale", price:38200},
-        {name:"Glue: Solver", price:31000}, {name:"Glue: Storm", price:19400}, {name:"Glue: Super Glue", price:33100}
-    ],
-    M: [
-        {name:"Sniper: Cripple MOAB", price:41000}, {name:"Sniper: Elite Sniper", price:17300}, {name:"Sniper: Elite Def", price:17500},
-        {name:"Sub: Energizer", price:36800}, {name:"Sub: Pre-Emptive", price:43000}, {name:"Sub: Sub Commander", price:34000},
-        {name:"Boat: Flagship", price:38000}, {name:"Boat: Pirate Lord", price:22800}, {name:"Boat: Trade Empire", price:24100},
-        {name:"Ace: Sky Shredder", price:46100}, {name:"Ace: Tsar Bomba", price:32400}, {name:"Ace: Flying Fortress", price:102000},
-        {name:"Heli: Apache Prime", price:58000}, {name:"Heli: Special Poperations", price:32400}, {name:"Heli: Com. Commander", price:38000},
-        {name:"Mortar: Biggest One", price:33400}, {name:"Mortar: Pop and Awe", price:36200}, {name:"Mortar: Blooncineration", price:45500},
-        {name:"Dartling: Ray of Doom", price:112000}, {name:"Dartling: M.A.D", price:69000}, {name:"Dartling: B.E.Z", price:62000}
-    ],
-    G: [
-        {name:"Desperado: Blazing Sun", price:38400}, {name:"Desperado: Golden Justice", price:54000}, {name:"Desperado: Desert Phantom", price:42600},
-        {name:"Wizard: Archmage", price:34200}, {name:"Wizard: WLP", price:58000}, {name:"Wizard: PoD", price:31800},
-        {name:"Super: True Sun God", price:585000}, {name:"Super: Anti-Bloon", price:103000}, {name:"Super: LotN", price:245000},
-        {name:"Ninja: Grandmaster", price:52000}, {name:"Ninja: Saboteur", price:25600}, {name:"Ninja: Master Bomber", price:44000},
-        {name:"Alch: Permabrew", price:72000}, {name:"Alch: Total Trans.", price:51000}, {name:"Alch: BMA", price:54000},
-        {name:"Druid: Superstorm", price:68000}, {name:"Druid: Spirit Forest", price:48000}, {name:"Druid: Avatar Wrath", price:52000},
-        {name:"Mermonkey: Lord of Abyss", price:36000}, {name:"Mermonkey: Popseidon", price:48000}, {name:"Mermonkey: Final Harmonic", price:42000}
-    ],
-    S: [
-        {name:"Spike: S-Mines", price:118000}, {name:"Spike: Carpet Spikes", price:34000}, {name:"Spike: Perma-Spike", price:39500},
-        {name:"Village: Prim. Expert", price:32000}, {name:"Village: Homeland", price:43200}, {name:"Village: Monkeyopolis", price:15000},
-        {name:"Engi: Sentry Champion", price:36000}, {name:"Engi: Ultraboost", price:101000}, {name:"Engi: XXXL Trap", price:58000},
-        {name:"Beast: Megalodon", price:66400}, {name:"Beast: Pouākai", price:48000}, {name:"Beast: Giganotosaurus", price:89900}
-    ]
+    heroes: [
+        {name:"Quincy", price:585}, {name:"Gwendolin", price:970}, {name:"Striker Jones", price:810}, {name:"Obyn Greenfoot", price:700},
+        {name:"Captain Churchill", price:2160}, {name:"Benjamin", price:1295}, {name:"Ezili", price:650}, {name:"Pat Fusty", price:865},
+        {name:"Adora", price:1080}, {name:"Admiral Brickell", price:970}, {name:"Etienne", price:920}, {name:"Sauda", price:650},
+        {name:"Psi", price:1080}, {name:"Geraldo", price:1325}, {name:"Corvus", price:1325}, {name:"Rosalia", price:1100}, {name:"Silas", price:1200}
+    ],
+    P: [
+        {name:"Desperado: Blazing Sun", price:38400},
+        {name:"Desperado: Golden Justice", price:54000},
+        {name:"Desperado: Desert Phantom", price:42600},
+        {name:"Dart: Ultra-Jugg", price:18740}, {name:"Dart: PMFC", price:53700}, {name:"Dart: XBM", price:27375},
+        {name:"Boomer: Glaive Lord", price:42100}, {name:"Boomer: P-Charge", price:38400}, {name:"Boomer: MOAB Dom", price:63500},
+        {name:"Bomb: Bloon Crush", price:61000}, {name:"Bomb: Eliminator", price:29100}, {name:"Bomb: Blitz", price:40500},
+        {name:"Tack: Inferno Ring", price:55500}, {name:"Tack: S-Maelstrom", price:17500}, {name:"Tack: Zone", price:25850},
+        {name:"Ice: Super Brittle", price:32800}, {name:"Ice: Absolute Zero", price:21600}, {name:"Ice: Icicle Impale", price:38200},
+        {name:"Glue: Solver", price:31000}, {name:"Glue: Storm", price:19400}, {name:"Glue: Super Glue", price:33100}
+    ],
+    M: [
+        {name:"Sniper: Cripple MOAB", price:41000}, {name:"Sniper: Elite Sniper", price:17300}, {name:"Sniper: Elite Def", price:17500},
+        {name:"Sub: Energizer", price:36800}, {name:"Sub: Pre-Emptive", price:43000}, {name:"Sub: Sub Commander", price:34000},
+        {name:"Boat: Flagship", price:38000}, {name:"Boat: Pirate Lord", price:22800}, {name:"Boat: Trade Empire", price:24100},
+        {name:"Ace: Sky Shredder", price:46100}, {name:"Ace: Tsar Bomba", price:32400}, {name:"Ace: Flying Fortress", price:102000},
+        {name:"Heli: Apache Prime", price:58000}, {name:"Heli: Special Poperations", price:32400}, {name:"Heli: Com. Commander", price:38000},
+        {name:"Mortar: Biggest One", price:33400}, {name:"Mortar: Pop and Awe", price:36200}, {name:"Mortar: Blooncineration", price:45500},
+        {name:"Dartling: Ray of Doom", price:112000}, {name:"Dartling: M.A.D", price:69000}, {name:"Dartling: B.E.Z", price:62000}
+    ],
+    G: [
+        {name:"Desperado: Blazing Sun", price:38400}, {name:"Desperado: Golden Justice", price:54000}, {name:"Desperado: Desert Phantom", price:42600},
+        {name:"Wizard: Archmage", price:34200}, {name:"Wizard: WLP", price:58000}, {name:"Wizard: PoD", price:31800},
+        {name:"Super: True Sun God", price:585000}, {name:"Super: Anti-Bloon", price:103000}, {name:"Super: LotN", price:245000},
+        {name:"Ninja: Grandmaster", price:52000}, {name:"Ninja: Saboteur", price:25600}, {name:"Ninja: Master Bomber", price:44000},
+        {name:"Alch: Permabrew", price:72000}, {name:"Alch: Total Trans.", price:51000}, {name:"Alch: BMA", price:54000},
+        {name:"Druid: Superstorm", price:68000}, {name:"Druid: Spirit Forest", price:48000}, {name:"Druid: Avatar Wrath", price:52000},
+        {name:"Mermonkey: Lord of Abyss", price:36000}, {name:"Mermonkey: Popseidon", price:48000}, {name:"Mermonkey: Final Harmonic", price:42000}
+    ],
+    S: [
+        {name:"Spike: S-Mines", price:118000}, {name:"Spike: Carpet Spikes", price:34000}, {name:"Spike: Perma-Spike", price:39500},
+        {name:"Village: Prim. Expert", price:32000}, {name:"Village: Homeland", price:43200}, {name:"Village: Monkeyopolis", price:15000},
+        {name:"Engi: Sentry Champion", price:36000}, {name:"Engi: Ultraboost", price:101000}, {name:"Engi: XXXL Trap", price:58000},
+        {name:"Beast: Megalodon", price:66400}, {name:"Beast: Pouākai", price:48000}, {name:"Beast: Giganotosaurus", price:89900}
+    ]
 };
 
 const CHIMPS_CUMULATIVE = {
-    6: 0, 7: 163, 8: 347, 9: 601, 10: 855, 11: 1036, 12: 1247, 13: 1538, 14: 1809, 
-    15: 2188, 16: 2533, 17: 2934, 18: 3401, 19: 3812, 20: 4319, 21: 4768, 22: 5214, 
-    23: 5621, 24: 5971, 25: 6418, 26: 6867, 27: 7451, 28: 8069, 29: 8617, 30: 9239, 
-    31: 9875, 32: 10582, 33: 11283, 34: 12154, 35: 12977, 36: 13998, 37: 15004, 
-    38: 16223, 39: 17316, 40: 18452, 41: 19693, 42: 21105, 43: 22442, 44: 23610, 
-    45: 25032, 46: 26343, 47: 28066, 48: 29774, 49: 31597, 50: 33490, 51: 35147, 
-    52: 36761, 53: 38407, 54: 40167, 55: 41846, 56: 43599, 57: 45318, 58: 47253, 
-    59: 48943, 60: 50645, 61: 52402, 62: 54181, 63: 55850, 64: 57606, 65: 59463, 
-    66: 61286, 67: 63148, 68: 64966, 69: 66804, 70: 68686, 71: 70550, 72: 72477, 
-    73: 74363, 74: 76326, 75: 78248, 76: 80108, 77: 82065, 78: 84084, 79: 86095, 
-    80: 88152, 81: 90240, 82: 92437, 83: 94676, 84: 96739, 85: 98863, 86: 100989, 
-    87: 103214, 88: 105436, 89: 107693, 90: 109968, 91: 112196, 92: 114488, 93: 116744, 
-    94: 119099, 95: 121408, 96: 123868, 97: 126282, 98: 128912, 99: 131518, 100: 178909
+    6: 0, 7: 163, 8: 347, 9: 601, 10: 855, 11: 1036, 12: 1247, 13: 1538, 14: 1809, 
+    15: 2188, 16: 2533, 17: 2934, 18: 3401, 19: 3812, 20: 4319, 21: 4768, 22: 5214, 
+    23: 5621, 24: 5971, 25: 6418, 26: 6867, 27: 7451, 28: 8069, 29: 8617, 30: 9239, 
+    31: 9875, 32: 10582, 33: 11283, 34: 12154, 35: 12977, 36: 13998, 37: 15004, 
+    38: 16223, 39: 17316, 40: 18452, 41: 19693, 42: 21105, 43: 22442, 44: 23610, 
+    45: 25032, 46: 26343, 47: 28066, 48: 29774, 49: 31597, 50: 33490, 51: 35147, 
+    52: 36761, 53: 38407, 54: 40167, 55: 41846, 56: 43599, 57: 45318, 58: 47253, 
+    59: 48943, 60: 50645, 61: 52402, 62: 54181, 63: 55850, 64: 57606, 65: 59463, 
+    66: 61286, 67: 63148, 68: 64966, 69: 66804, 70: 68686, 71: 70550, 72: 72477, 
+    73: 74363, 74: 76326, 75: 78248, 76: 80108, 77: 82065, 78: 84084, 79: 86095, 
+    80: 88152, 81: 90240, 82: 92437, 83: 94676, 84: 96739, 85: 98863, 86: 100989, 
+    87: 103214, 88: 105436, 89: 107693, 90: 109968, 91: 112196, 92: 114488, 93: 116744, 
+    94: 119099, 95: 121408, 96: 123868, 97: 126282, 98: 128912, 99: 131518, 100: 178909
 };
 
 function getCashAtRound(r) {
-    if (r <= 6) return 0;
-    if (CHIMPS_CUMULATIVE[r] !== undefined) return CHIMPS_CUMULATIVE[r];
-    let keys = Object.keys(CHIMPS_CUMULATIVE).map(Number).sort((a,b)=>a-b);
-    for(let i=0; i<keys.length-1; i++) {
-        if(r > keys[i] && r < keys[i+1]) {
-            let percent = (r - keys[i]) / (keys[i+1] - keys[i]);
-            return Math.floor(CHIMPS_CUMULATIVE[keys[i]] + (CHIMPS_CUMULATIVE[keys[i+1]] - CHIMPS_CUMULATIVE[keys[i]]) * percent);
-        }
-    }
-    return r > 100 ? 178909 : 0;
+    if (r <= 6) return 0;
+    if (CHIMPS_CUMULATIVE[r] !== undefined) return CHIMPS_CUMULATIVE[r];
+    let keys = Object.keys(CHIMPS_CUMULATIVE).map(Number).sort((a,b)=>a-b);
+    for(let i=0; i<keys.length-1; i++) {
+        if(r > keys[i] && r < keys[i+1]) {
+            let percent = (r - keys[i]) / (keys[i+1] - keys[i]);
+            return Math.floor(CHIMPS_CUMULATIVE[keys[i]] + (CHIMPS_CUMULATIVE[keys[i+1]] - CHIMPS_CUMULATIVE[keys[i]]) * percent);
+        }
+    }
+    return r > 100 ? 178909 : 0;
 }
 
 function findRoundForPrice(targetPrice, curCash, curR, isCoop) {
-    for (let r = curR; r <= 100; r++) {
-        let earned = getCashAtRound(r) - getCashAtRound(curR);
-        let myShare = isCoop ? (earned * 0.6666) : earned;
-        if ((curCash + myShare) >= targetPrice) return r;
-    }
-    return null;
+    for (let r = curR; r <= 100; r++) {
+        let earned = getCashAtRound(r) - getCashAtRound(curR);
+        let myShare = isCoop ? (earned * 0.6666) : earned;
+        if ((curCash + myShare) >= targetPrice) return r;
+    }
+    return null;
 }
 
 function toggleCoop() {
-    const isCoop = document.getElementById('coopToggle').checked;
-    document.getElementById('curCash').value = isCoop ? 900 : 650;
-    document.getElementById('curRound').value = 6;
-    updateUI();
+    const isCoop = document.getElementById('coopToggle').checked;
+    document.getElementById('curCash').value = isCoop ? 900 : 650;
+    document.getElementById('curRound').value = 6;
+    updateUI();
 }
 
 function updateUI() {
-    const isCoop = document.getElementById('coopToggle').checked;
-    const curCash = parseFloat(document.getElementById('curCash').value) || 0;
-    const curR = parseInt(document.getElementById('curRound').value) || 6;
-    const futR = parseInt(document.getElementById('futRound').value) || 100;
+    const isCoop = document.getElementById('coopToggle').checked;
+    const curCash = parseFloat(document.getElementById('curCash').value) || 0;
+    const curR = parseInt(document.getElementById('curRound').value) || 6;
+    const futR = parseInt(document.getElementById('futRound').value) || 100;
 
-    const earnedTotal = getCashAtRound(futR) - getCashAtRound(curR);
-    const myShare = isCoop ? (earnedTotal * 0.6666) : earnedTotal;
-    const totalProjected = curCash + myShare;
+    const earnedTotal = getCashAtRound(futR) - getCashAtRound(curR);
+    const myShare = isCoop ? (earnedTotal * 0.6666) : earnedTotal;
+    const totalProjected = curCash + myShare;
 
-    document.getElementById('projectionDisplay').innerText = `Projected Wallet: $${Math.floor(totalProjected).toLocaleString()}`;
-    document.getElementById('modeSubtitle').innerText = isCoop ? "Co-op Mode (2/3 Team Share)" : "Single Player Mode";
-    document.getElementById('mainBody').classList.toggle('coop-mode', isCoop);
+    document.getElementById('projectionDisplay').innerText = `Projected Wallet: $${Math.floor(totalProjected).toLocaleString()}`;
+    document.getElementById('modeSubtitle').innerText = isCoop ? "Co-op Mode (2/3 Team Share)" : "Single Player Mode";
+    document.getElementById('mainBody').classList.toggle('coop-mode', isCoop);
 
-    const hero = DATA.heroes[document.getElementById('heroSelect').value] || DATA.heroes[0];
-    const t1 = getTower(document.getElementById('tower1').value);
-    const t2 = getTower(document.getElementById('tower2').value);
-    
-    const costHero = hero.price;
-    const costT1 = t1.price;
-    const costT2 = t2.price;
-    const costTotal = costHero + costT1 + costT2;
+    const hero = DATA.heroes[document.getElementById('heroSelect').value] || DATA.heroes[0];
+    const t1 = getTower(document.getElementById('tower1').value);
+    const t2 = getTower(document.getElementById('tower2').value);
+    
+    const costHero = hero.price;
+    const costT1 = t1.price;
+    const costT2 = t2.price;
+    const costTotal = costHero + costT1 + costT2;
 
-    document.getElementById('priceReport').innerHTML = `
-        <div class="cost-row"><span>${hero.name} (Ref)</span><span>$${costHero.toLocaleString()}</span></div>
-        <div class="cost-row"><span>${t1.name}</span><span>$${costT1.toLocaleString()}</span></div>
-        <div class="cost-row"><span>${t2.name}</span><span>$${costT2.toLocaleString()}</span></div>
-    `;
+    document.getElementById('priceReport').innerHTML = `
+        <div class="cost-row"><span>${hero.name} (Ref)</span><span>$${costHero.toLocaleString()}</span></div>
+        <div class="cost-row"><span>${t1.name}</span><span>$${costT1.toLocaleString()}</span></div>
+        <div class="cost-row"><span>${t2.name}</span><span>$${costT2.toLocaleString()}</span></div>
+    `;
 
-    const totalBox = document.getElementById('totalDisplay');
-    totalBox.innerText = `Build Total: $${costTotal.toLocaleString()}`;
-    totalBox.className = "total-box " + (costTotal > totalProjected ? "over-budget" : "under-budget");
+    const totalBox = document.getElementById('totalDisplay');
+    totalBox.innerText = `Build Total: $${costTotal.toLocaleString()}`;
+    totalBox.className = "total-box " + (costTotal > totalProjected ? "over-budget" : "under-budget");
 
-    document.getElementById('saveupAdvice').innerHTML = costTotal > totalProjected 
-        ? `🚨 Short by $${Math.floor(costTotal - totalProjected).toLocaleString()}`
-        : `✅ Affordable! Surplus: $${Math.floor(totalProjected - costTotal).toLocaleString()}`;
+    document.getElementById('saveupAdvice').innerHTML = costTotal > totalProjected 
+        ? `🚨 Short by $${Math.floor(costTotal - totalProjected).toLocaleString()}`
+        : `✅ Affordable! Surplus: $${Math.floor(totalProjected - costTotal).toLocaleString()}`;
 
-    // Timeline logic excluding Hero cost
-    const rT1 = findRoundForPrice(costT1, curCash, curR, isCoop);
-    const rT2 = findRoundForPrice(costT2, curCash, curR, isCoop);
-    const rBoth = findRoundForPrice(costT1 + costT2, curCash, curR, isCoop);
+    // Timeline logic excluding Hero cost
+    const rT1 = findRoundForPrice(costT1, curCash, curR, isCoop);
+    const rT2 = findRoundForPrice(costT2, curCash, curR, isCoop);
+    const rBoth = findRoundForPrice(costT1 + costT2, curCash, curR, isCoop);
 
-    document.getElementById('milestoneList').innerHTML = `
-        <div class="milestone-item">
-            <span class="ms-label">Afford ${t1.name}:</span>
-            <span class="ms-round">${rT1 ? 'Round ' + rT1 : '<span class="ms-impossible">Too Expensive</span>'}</span>
-        </div>
-        <div class="milestone-item">
-            <span class="ms-label">Afford ${t2.name}:</span>
-            <span class="ms-round">${rT2 ? 'Round ' + rT2 : '<span class="ms-impossible">Too Expensive</span>'}</span>
-        </div>
-    `;
+    document.getElementById('milestoneList').innerHTML = `
+        <div class="milestone-item">
+            <span class="ms-label">Afford ${t1.name}:</span>
+            <span class="ms-round">${rT1 ? 'Round ' + rT1 : '<span class="ms-impossible">Too Expensive</span>'}</span>
+        </div>
+        <div class="milestone-item">
+            <span class="ms-label">Afford ${t2.name}:</span>
+            <span class="ms-round">${rT2 ? 'Round ' + rT2 : '<span class="ms-impossible">Too Expensive</span>'}</span>
+        </div>
+        <div class="milestone-item" style="border-left-color: #00d1b2;">
+            <span class="ms-label">Afford BOTH Towers:</span>
+            <span class="ms-round">${rBoth ? 'Round ' + rBoth : '<span class="ms-impossible">Out of Budget</span>'}</span>
+        </div>
+    `;
 }
 
 function getTower(val) {
-    if(!val) return {name:"None", price:0};
-    return DATA[val[0]][val.substring(1)] || {name:"None", price:0};
+    if(!val) return {name:"None", price:0};
+    return DATA[val[0]][val.substring(1)] || {name:"None", price:0};
 }
 
 function populate() {
-    const hSel = document.getElementById('heroSelect');
-    hSel.innerHTML = "";
-    DATA.heroes.forEach((h, i) => hSel.add(new Option(`${h.name} ($${h.price})`, i)));
-    ['tower1', 'tower2'].forEach(id => {
-        const s = document.getElementById(id);
-        s.innerHTML = "";
-        const cats = [{l:"Primary", k:"P"}, {l:"Military", k:"M"}, {l:"Magic", k:"G"}, {l:"Support", k:"S"}];
-        cats.forEach(c => {
-            const g = document.createElement('optgroup'); g.label = c.l;
-            DATA[c.k].forEach((t, i) => g.appendChild(new Option(t.name, c.k + i)));
-            s.appendChild(g);
-        });
-    });
+    const hSel = document.getElementById('heroSelect');
+    hSel.innerHTML = "";
+    DATA.heroes.forEach((h, i) => hSel.add(new Option(`${h.name} ($${h.price})`, i)));
+    ['tower1', 'tower2'].forEach(id => {
+        const s = document.getElementById(id);
+        s.innerHTML = "";
+        const cats = [{l:"Primary", k:"P"}, {l:"Military", k:"M"}, {l:"Magic", k:"G"}, {l:"Support", k:"S"}];
+        cats.forEach(c => {
+            const g = document.createElement('optgroup'); g.label = c.l;
+            DATA[c.k].forEach((t, i) => g.appendChild(new Option(t.name, c.k + i)));
+            s.appendChild(g);
+        });
+    });
 }
 
 function rollRandom() {
-    document.getElementById('heroSelect').selectedIndex = Math.floor(Math.random() * DATA.heroes.length);
-    ['tower1', 'tower2'].forEach(id => {
-        const cats = ['P', 'M', 'G', 'S'];
-        const cat = cats[Math.floor(Math.random() * 4)];
-        document.getElementById(id).value = cat + Math.floor(Math.random() * DATA[cat].length);
-    });
-    updateUI();
+    document.getElementById('heroSelect').selectedIndex = Math.floor(Math.random() * DATA.heroes.length);
+    ['tower1', 'tower2'].forEach(id => {
+        const cats = ['P', 'M', 'G', 'S'];
+        const cat = cats[Math.floor(Math.random() * 4)];
+        document.getElementById(id).value = cat + Math.floor(Math.random() * DATA[cat].length);
+    });
+    updateUI();
 }
 
 populate();
