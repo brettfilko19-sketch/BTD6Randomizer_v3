@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BTD6 Precise Planner - 2025 Roster</title>
+    <title>BTD6 Precise Planner - Milestone Edition</title>
     <style>
-        :root { --primary: #00d1b2; --bg-card: #1a1c23; --bg-body: #0b0e14; --border: #2d333b; }
+        :root { --primary: #00d1b2; --bg-card: #1a1c23; --bg-body: #0b0e14; --border: #2d333b; --accent: #3298dc; }
         .coop-mode { --primary: #ffdd57; --border: #5d4d8a; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg-body); color: #e0e0e0; padding: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg-body); color: #e0e0e0; padding: 20px; line-height: 1.4; }
         .container { max-width: 900px; margin: auto; background: var(--bg-card); padding: 25px; border-radius: 12px; border: 2px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
         h2 { color: var(--primary); text-align: center; text-transform: uppercase; margin-bottom: 5px; }
         .subtitle { text-align: center; color: #7a7a7a; font-size: 0.85em; margin-bottom: 20px; }
@@ -21,11 +21,18 @@
         .projector-box { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
         .projection-result { font-size: 1.3em; color: var(--primary); text-align: center; font-weight: bold; }
         .btn-random { width: 100%; padding: 15px; background: var(--primary); color: #0b0e14; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 20px; font-size: 1em; }
-        .summary { background: #0b0e14; padding: 20px; border-radius: 10px; border-left: 5px solid var(--primary); }
+        .summary { background: #0b0e14; padding: 20px; border-radius: 10px; border-left: 5px solid var(--primary); margin-bottom: 20px; }
         .total-box { font-size: 1.8em; text-align: center; margin-top: 10px; padding: 15px; border-radius: 8px; font-weight: bold; }
         .under-budget { border: 2px solid #00d1b2; color: #00d1b2; background: rgba(0, 209, 178, 0.05); }
         .over-budget { border: 2px solid #ff3860; color: #ff3860; background: rgba(255, 56, 96, 0.05); }
         .cost-row { display: flex; justify-content: space-between; border-bottom: 1px solid #2d333b; padding: 8px 0; font-size: 0.95em; }
+        
+        /* Milestone Styling */
+        .milestone-container { background: #12141a; border-radius: 8px; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .milestone-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #1c1f26; border-radius: 4px; border-left: 4px solid var(--accent); }
+        .ms-label { font-size: 0.9em; font-weight: bold; }
+        .ms-round { color: var(--primary); font-weight: bold; font-size: 1.1em; }
+        .ms-impossible { color: #ff3860; font-size: 0.8em; }
     </style>
 </head>
 <body id="mainBody">
@@ -51,9 +58,11 @@
 
     <button class="btn-random" onclick="rollRandom()">🎲 RANDOMIZE BUILD</button>
 
-    <div class="input-group">
-        <label>Hero:</label>
-        <select id="heroSelect" onchange="updateUI()"></select>
+    <div class="flex-row">
+        <div style="flex: 2;">
+            <label>Hero:</label>
+            <select id="heroSelect" onchange="updateUI()"></select>
+        </div>
     </div>
 
     <div class="flex-row">
@@ -66,6 +75,10 @@
         <div id="totalDisplay" class="total-box">Total: $0</div>
         <div id="saveupAdvice" style="margin-top:15px; font-style: italic; color: #95a5a6; text-align: center;"></div>
     </div>
+
+    <div class="section-title">🕒 PURCHASE TIMELINE (AFFORDABILITY)</div>
+    <div class="milestone-container" id="milestoneList">
+        </div>
 </div>
 
 <script>
@@ -106,7 +119,6 @@ const DATA = {
 };
 
 // PRECISE BTD6 CHIMPS TOTAL INCOME PER ROUND END
-// Represents cumulative money earned FROM Round 6 onward.
 const CHIMPS_CUMULATIVE = {
     6: 0, 7: 163, 8: 347, 9: 601, 10: 855, 11: 1036, 12: 1247, 13: 1538, 14: 1809, 
     15: 2188, 16: 2533, 17: 2934, 18: 3401, 19: 3812, 20: 4319, 21: 4768, 22: 5214, 
@@ -126,8 +138,7 @@ const CHIMPS_CUMULATIVE = {
 function getCashAtRound(r) {
     if (r <= 6) return 0;
     if (CHIMPS_CUMULATIVE[r] !== undefined) return CHIMPS_CUMULATIVE[r];
-    
-    // Safety fallback for intermediate calculation
+    // Interpolation fallback for safety
     let keys = Object.keys(CHIMPS_CUMULATIVE).map(Number).sort((a,b)=>a-b);
     for(let i=0; i<keys.length-1; i++) {
         if(r > keys[i] && r < keys[i+1]) {
@@ -136,6 +147,15 @@ function getCashAtRound(r) {
         }
     }
     return r > 100 ? 178909 : 0;
+}
+
+function findRoundForPrice(targetPrice, curCash, curR, isCoop) {
+    for (let r = curR; r <= 100; r++) {
+        let earned = getCashAtRound(r) - getCashAtRound(curR);
+        let myShare = isCoop ? (earned * 0.6666) : earned;
+        if ((curCash + myShare) >= targetPrice) return r;
+    }
+    return null;
 }
 
 function toggleCoop() {
@@ -159,25 +179,50 @@ function updateUI() {
     document.getElementById('modeSubtitle').innerText = isCoop ? "Co-op Mode (2/3 Team Share)" : "Single Player Mode";
     document.getElementById('mainBody').classList.toggle('coop-mode', isCoop);
 
-    const heroVal = document.getElementById('heroSelect').value;
-    const hero = DATA.heroes[heroVal] || DATA.heroes[0];
+    const hero = DATA.heroes[document.getElementById('heroSelect').value] || DATA.heroes[0];
     const t1 = getTower(document.getElementById('tower1').value);
     const t2 = getTower(document.getElementById('tower2').value);
-    const cost = hero.price + t1.price + t2.price;
+    
+    const costHero = hero.price;
+    const costT1 = t1.price;
+    const costT2 = t2.price;
+    const costTotal = costHero + costT1 + costT2;
 
     document.getElementById('priceReport').innerHTML = `
-        <div class="cost-row"><span>${hero.name}</span><span>$${hero.price.toLocaleString()}</span></div>
-        <div class="cost-row"><span>${t1.name}</span><span>$${t1.price.toLocaleString()}</span></div>
-        <div class="cost-row"><span>${t2.name}</span><span>$${t2.price.toLocaleString()}</span></div>
+        <div class="cost-row"><span>${hero.name}</span><span>$${costHero.toLocaleString()}</span></div>
+        <div class="cost-row"><span>${t1.name}</span><span>$${costT1.toLocaleString()}</span></div>
+        <div class="cost-row"><span>${t2.name}</span><span>$${costT2.toLocaleString()}</span></div>
     `;
 
     const totalBox = document.getElementById('totalDisplay');
-    totalBox.innerText = `Total Cost: $${cost.toLocaleString()}`;
-    totalBox.className = "total-box " + (cost > totalProjected ? "over-budget" : "under-budget");
+    totalBox.innerText = `Total Build: $${costTotal.toLocaleString()}`;
+    totalBox.className = "total-box " + (costTotal > totalProjected ? "over-budget" : "under-budget");
 
-    document.getElementById('saveupAdvice').innerHTML = cost > totalProjected 
-        ? `🚨 Short by $${Math.floor(cost - totalProjected).toLocaleString()}`
-        : `✅ Affordable! Surplus: $${Math.floor(totalProjected - cost).toLocaleString()}`;
+    document.getElementById('saveupAdvice').innerHTML = costTotal > totalProjected 
+        ? `🚨 Short by $${Math.floor(costTotal - totalProjected).toLocaleString()}`
+        : `✅ Affordable! Surplus: $${Math.floor(totalProjected - costTotal).toLocaleString()}`;
+
+    // Calculate Milestones
+    const rHero = findRoundForPrice(costHero, curCash, curR, isCoop);
+    const rT1 = findRoundForPrice(costHero + costT1, curCash, curR, isCoop);
+    const rT2 = findRoundForPrice(costHero + costT2, curCash, curR, isCoop); // Standalone T2 after Hero
+    const rFull = findRoundForPrice(costTotal, curCash, curR, isCoop);
+
+    const mList = document.getElementById('milestoneList');
+    mList.innerHTML = `
+        <div class="milestone-item">
+            <span class="ms-label">Afford ${hero.name}:</span>
+            <span class="ms-round">${rHero ? 'Round ' + rHero : '<span class="ms-impossible">Too Expensive</span>'}</span>
+        </div>
+        <div class="milestone-item">
+            <span class="ms-label">Afford ${t1.name}:</span>
+            <span class="ms-round">${rT1 ? 'Round ' + rT1 : '<span class="ms-impossible">Too Expensive</span>'}</span>
+        </div>
+        <div class="milestone-item">
+            <span class="ms-label">Afford Full Build:</span>
+            <span class="ms-round">${rFull ? 'Round ' + rFull : '<span class="ms-impossible">Out of Budget</span>'}</span>
+        </div>
+    `;
 }
 
 function getTower(val) {
