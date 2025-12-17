@@ -36,13 +36,13 @@
 
     <div class="coop-toggle-container">
         <input type="checkbox" id="coopToggle" onchange="toggleCoop()">
-        <label for="coopToggle">👥 3-Player Co-op (Me & Brother: 2/3 Share)</label>
+        <label for="coopToggle">👥 3-Player Co-op (2/3 Share)</label>
     </div>
 
     <div class="section-title">CASH PROJECTOR (VERIFIED 2025)</div>
     <div class="projector-box">
         <div class="flex-row">
-            <div><label>Current Cash</label><input type="number" id="curCash" value="0" oninput="updateUI()"></div>
+            <div><label>Current Cash</label><input type="number" id="curCash" value="650" oninput="updateUI()"></div>
             <div><label>Current Round</label><input type="number" id="curRound" value="6" min="6" max="100" oninput="updateUI()"></div>
             <div><label>Target Round</label><input type="number" id="futRound" value="100" min="6" max="100" oninput="updateUI()"></div>
         </div>
@@ -57,8 +57,8 @@
     </div>
 
     <div class="flex-row">
-        <div><label>Tower 1 (Any Category):</label><select id="tower1" onchange="updateUI()"></select></div>
-        <div><label>Tower 2 (Any Category):</label><select id="tower2" onchange="updateUI()"></select></div>
+        <div><label>Tower 1:</label><select id="tower1" onchange="updateUI()"></select></div>
+        <div><label>Tower 2:</label><select id="tower2" onchange="updateUI()"></select></div>
     </div>
 
     <div class="summary">
@@ -69,7 +69,6 @@
 </div>
 
 <script>
-// Data includes all standard T5 towers and paths
 const DATA = {
     heroes: [
         {name:"Quincy", price:585}, {name:"Gwendolin", price:970}, {name:"Striker Jones", price:810}, {name:"Obyn Greenfoot", price:700},
@@ -110,10 +109,8 @@ const DATA = {
     ]
 };
 
-const ROUND_CASH = {
-    6:650, 40:16771, 60:51200, 80:98717, 100:178909
-};
-// Simple interpolation for rounds in between
+const ROUND_CASH = { 6:650, 40:16771, 60:51200, 80:98717, 100:178909 };
+
 function getCashAtRound(r) {
     if(ROUND_CASH[r]) return ROUND_CASH[r];
     let keys = Object.keys(ROUND_CASH).map(Number).sort((a,b)=>a-b);
@@ -127,6 +124,9 @@ function getCashAtRound(r) {
 }
 
 function toggleCoop() {
+    const isCoop = document.getElementById('coopToggle').checked;
+    document.getElementById('curCash').value = isCoop ? 900 : 650;
+    document.getElementById('curRound').value = 6;
     updateUI();
 }
 
@@ -136,8 +136,13 @@ function updateUI() {
     const curR = parseInt(document.getElementById('curRound').value) || 6;
     const futR = parseInt(document.getElementById('futRound').value) || 100;
 
-    const earnedTotal = getCashAtRound(futR) - getCashAtRound(curR);
-    const myShare = isCoop ? (earnedTotal * 0.666) : earnedTotal;
+    // In Co-op, the cumulative income starts at $650 baseline but you get $900 personal start.
+    // Income earned is from Round 6 end ($650) to Future Round.
+    const teamEarnedSinceR6End = getCashAtRound(futR) - 650;
+    const teamEarnedSinceCurrentRound = getCashAtRound(futR) - getCashAtRound(curR);
+    
+    // Logic: Current Cash + (Future Income * 2/3 share)
+    const myShare = isCoop ? (teamEarnedSinceCurrentRound * 0.666) : teamEarnedSinceCurrentRound;
     const totalProjected = curCash + myShare;
 
     document.getElementById('projectionDisplay').innerText = `Projected Wallet: $${Math.floor(totalProjected).toLocaleString()}`;
@@ -156,7 +161,7 @@ function updateUI() {
     `;
 
     const totalBox = document.getElementById('totalDisplay');
-    totalBox.innerText = `Total: $${cost.toLocaleString()}`;
+    totalBox.innerText = `Total Build Cost: $${cost.toLocaleString()}`;
     totalBox.className = "total-box " + (cost > totalProjected ? "over-budget" : "under-budget");
 
     document.getElementById('saveupAdvice').innerHTML = cost > totalProjected 
@@ -172,7 +177,6 @@ function getTower(val) {
 function populate() {
     const hSel = document.getElementById('heroSelect');
     DATA.heroes.forEach((h, i) => hSel.add(new Option(`${h.name} ($${h.price})`, i)));
-    
     ['tower1', 'tower2'].forEach(id => {
         const s = document.getElementById(id);
         const cats = [{l:"Primary", k:"P"}, {l:"Military", k:"M"}, {l:"Magic", k:"G"}, {l:"Support", k:"S"}];
